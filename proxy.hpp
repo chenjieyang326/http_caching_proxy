@@ -10,6 +10,7 @@
 
 #include "utils.hpp"
 #include "response.hpp"
+#include "parser_request.hpp"
 
 class Proxy {
     private:
@@ -22,4 +23,5 @@ class Proxy {
     void run();
     static void *handle(void * input);
     static void CONNECT_request(int client_fd, int client_id, int server_fd);
+    static void POST_request(int client_fd, int client_id, int server_fd, const string & content_length, const Parser_request & parser);
 };

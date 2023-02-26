@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <cstring>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
@@ -11,10 +12,9 @@
 #include <sys/socket.h>
 #include <unordered_map>
 #include <vector>
-#include <cstring>
 
 #include "client.hpp"
-#include "parser_request.hpp"
+#include "parser_response.hpp"
 #include "proxy.hpp"
 #include "utils.hpp"
 
@@ -71,8 +71,8 @@ void *Proxy::handle(void *input) {
   request_content.assign(request_message, len);
   Parser_request request_parsed(request_content);
   pthread_mutex_lock(&mutex);
-  logFile << client_id << ": \"" << request_parsed.first_line << "\" from " << client_ip
-          << " @ " << getCurrTime().append("\0");
+  logFile << client_id << ": \"" << request_parsed.first_line << "\" from "
+          << client_ip << " @ " << getCurrTime().append("\0");
   pthread_mutex_unlock(&mutex);
   if (request_parsed.method != "GET" && request_parsed.method != "POST" &&
       request_parsed.method != "CONNECT") {
@@ -83,13 +83,15 @@ void *Proxy::handle(void *input) {
             << std::endl;
     pthread_mutex_unlock(&mutex);
   } else {
-    const char * request_hostname = request_parsed.hostname.c_str();
-    const char * port = request_parsed.port.c_str();
+    const char *request_hostname = request_parsed.hostname.c_str();
+    const char *port = request_parsed.port.c_str();
     int server_fd = client_setup(request_hostname, port);
     if (request_parsed.method == "GET") {
       // handle GET request
     } else if (request_parsed.method == "POST") {
       // handle POST request
+      POST_request(client_fd, client_id, server_fd,
+                   request_parsed.headers["Content-Length"], request_parsed);
     } else {
       // handle CONNECT request
       CONNECT_request(client_fd, client_id, server_fd);
@@ -122,7 +124,8 @@ void Proxy::CONNECT_request(int client_fd, int client_id, int server_fd) {
 
     char received_client_message[100000] = {0};
     if (FD_ISSET(client_fd, &readfds)) {
-      len_received_client = recv(client_fd, &received_client_message, sizeof(received_client_message), MSG_NOSIGNAL);
+      len_received_client = recv(client_fd, &received_client_message,
+                                 sizeof(received_client_message), MSG_NOSIGNAL);
       if (len_received_client <= 0) {
         pthread_mutex_lock(&mutex);
         cout << "Fail to receive client message from tunnel" << endl;
@@ -130,7 +133,8 @@ void Proxy::CONNECT_request(int client_fd, int client_id, int server_fd) {
         pthread_mutex_unlock(&mutex);
         return;
       }
-      len_sent_client = send(server_fd, &received_client_message, sizeof(received_client_message), MSG_NOSIGNAL);
+      len_sent_client = send(server_fd, &received_client_message,
+                             sizeof(received_client_message), MSG_NOSIGNAL);
       if (len_sent_client <= 0) {
         pthread_mutex_lock(&mutex);
         cout << "Fail to send client message from tunnel" << endl;
@@ -143,7 +147,8 @@ void Proxy::CONNECT_request(int client_fd, int client_id, int server_fd) {
     int len_received_server, len_sent_server;
     char received_server_message[100000] = {0};
     if (FD_ISSET(server_fd, &readfds)) {
-      len_received_server = recv(server_fd, &received_server_message, sizeof(received_server_message), MSG_NOSIGNAL);
+      len_received_server = recv(server_fd, &received_server_message,
+                                 sizeof(received_server_message), MSG_NOSIGNAL);
       if (len_received_server <= 0) {
         pthread_mutex_lock(&mutex);
         cout << "Fail to receive server message from tunnel" << endl;
@@ -151,7 +156,8 @@ void Proxy::CONNECT_request(int client_fd, int client_id, int server_fd) {
         pthread_mutex_unlock(&mutex);
         return;
       }
-      len_sent_server = send(client_fd, &received_server_message, sizeof(received_server_message), MSG_NOSIGNAL);
+      len_sent_server = send(client_fd, &received_server_message,
+                             sizeof(received_server_message), MSG_NOSIGNAL);
       if (len_sent_server <= 0) {
         pthread_mutex_lock(&mutex);
         cout << "Fail to send server message from tunnel" << endl;
@@ -160,5 +166,49 @@ void Proxy::CONNECT_request(int client_fd, int client_id, int server_fd) {
         return;
       }
     }
+  }
+}
+
+void POST_request(int client_fd, int client_id, int server_fd,
+                  const string &content_length,
+                  const Parser_request &parser_request) {
+  pthread_mutex_lock(&mutex);
+  logFile << client_id << ": "
+          << "Requesting \"" << parser_request.first_line << "\" from "
+          << parser_request.hostname << endl;
+  pthread_mutex_unlock(&mutex);
+  int content_len = stoi(content_length);
+  if (content_len == -1) {
+    cout << "Cannot get request content length in POST request" << endl;
+    return;
+  } else {
+    string request_content = parser_request.request_content;
+    string complete_request =
+        receive_complete_message(client_fd, request_content, content_len);
+    char request_to_send[complete_request.length() + 1];
+    strcpy(request_to_send, complete_request.c_str());
+    // send complete request to server
+    send(server_fd, &request_to_send, sizeof(request_to_send), MSG_NOSIGNAL);
+    // receive server response
+    char server_response_buffer[100000] = {0};
+    int server_response_len =
+        recv(server_fd, &server_response_buffer, sizeof(server_response_buffer),
+             MSG_NOSIGNAL);
+    if (server_response_len <= 0) {
+      cout << "Cannot receive server response from POST request" << endl;
+      return;
+    }
+
+    string server_response_str = string(server_response_buffer);
+    Response_parser parser_response(server_response_str);
+    pthread_mutex_lock(&mutex);
+    logFile << client_id << ": Received \"" << parser_response.firstLine
+            << "\" from " << parser_request.hostname << endl;
+    pthread_mutex_unlock(&mutex);
+
+    send(client_fd, &server_response_buffer, sizeof(server_response_buffer), MSG_NOSIGNAL);
+    pthread_mutex_lock(&mutex);
+    logFile << client_id << ": Responding \"" << parser_response.firstLine << endl;
+    pthread_mutex_unlock(&mutex);
   }
 }

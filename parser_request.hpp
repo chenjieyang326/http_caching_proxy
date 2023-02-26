@@ -3,6 +3,7 @@
 
 class Parser_request {
 public:
+  std::string request_content;
   std::string first_line;
   std::string method;
   std::string url;
@@ -10,7 +11,7 @@ public:
   std::string port;
   std::unordered_map<std::string, std::string> headers;
   
-  Parser_request(const std::string &request) {
+  Parser_request(const std::string &request) : request_content(request) {
     // Find the position of the first newline character in the request
     std::size_t newlinePos = request.find('\n');
 

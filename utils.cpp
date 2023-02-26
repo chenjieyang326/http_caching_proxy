@@ -1,4 +1,5 @@
 #include "utils.hpp"
+#include <sys/socket.h>
 
 using namespace std;
 
@@ -103,4 +104,20 @@ int server_accept(int socket_fd, string & ip) {
   struct sockaddr_in * addr = (struct sockaddr_in *)&socket_addr;
   ip = inet_ntoa(addr->sin_addr);
   return client_connection_fd;
+}
+
+string receive_complete_message(int sender_fd, string & sender_message, int content_len) {
+  int cum_len = 0, received_len = 0;
+
+  for (;;) {
+    if (cum_len >= content_len) break;
+    char buffer[100000] = {0};
+    if ((received_len = recv(sender_fd, &buffer, sizeof(buffer), MSG_NOSIGNAL)) <= 0) {
+      break;
+    }
+    string buffer_string(buffer, received_len);
+    sender_message += buffer_string;
+    cum_len += received_len;
+  }
+  return sender_message;
 }
