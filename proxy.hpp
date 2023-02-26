@@ -21,4 +21,5 @@ class Proxy {
     Proxy(const char * port) : port(port), cache(50) {}
     void run();
     static void *handle(void * input);
+    static void CONNECT_request(int client_fd, int client_id, int server_fd);
 };
