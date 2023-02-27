@@ -51,6 +51,8 @@ private:
         std::string line;
         std::istringstream header_stream(header);
         headers_map["Content-Length"] = "-1";
+        headers_map["Etag"] = "";
+        headers_map["Last-Modified"] = "";
         while (std::getline(header_stream, line)) {
             if (line.back() == '\r') {
                 line.pop_back();

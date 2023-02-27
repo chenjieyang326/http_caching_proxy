@@ -230,7 +230,58 @@ void Proxy::GET_request(int client_fd, int client_id, int server_fd,
     send(server_fd, &request_message, sizeof(request_message), MSG_NOSIGNAL);
     get_from_server(client_fd, client_id, server_fd, request_parsed);
   } else { // found in cache
-    
+    int no_cache = (it->second.CacheControl.find("no-cache") != string::npos);
+    if (no_cache) {
+      if (revalidate(it->second, server_fd, client_id)) {
+        // ask server
+        pthread_mutex_lock(&mutex);
+        logFile << client_id << ": Requesting \"" << it->second.firstLine
+                << "\" from " << request_parsed.hostname << endl;
+        pthread_mutex_unlock(&mutex);
+        string original_request_message_str = request_parsed.request_content;
+        char original_request_message[original_request_message_str.size() + 1];
+        strcpy(original_request_message, original_request_message_str.c_str());
+        send(server_fd, &original_request_message,
+             sizeof(original_request_message), MSG_NOSIGNAL);
+        get_from_server(client_fd, client_id, server_fd, request_parsed);
+      } else {
+        // use cache
+        char cached_response[it->second.response_content.size() + 1];
+        strcpy(cached_response, it->second.response_content.c_str());
+        send(client_fd, &cached_response, sizeof(cached_response),
+             MSG_NOSIGNAL);
+        pthread_mutex_lock(&mutex);
+        logFile << client_id << ": Responding \"" << it->second.firstLine
+                << "\"" << endl;
+        pthread_mutex_unlock(&mutex);
+      }
+    } else {
+      int valid = check_expire(server_fd, request_parsed, it->second,
+                               client_id); // = check_time
+      if (valid) {
+        // use cache
+        char cached_response[it->second.response_content.size() + 1];
+        strcpy(cached_response, it->second.response_content.c_str());
+        send(client_fd, &cached_response, sizeof(cached_response),
+             MSG_NOSIGNAL);
+        pthread_mutex_lock(&mutex);
+        logFile << client_id << ": Responding \"" << it->second.firstLine
+                << "\"" << endl;
+        pthread_mutex_unlock(&mutex);
+      } else {
+        // ask server
+        pthread_mutex_lock(&mutex);
+        logFile << client_id << ": Requesting \"" << it->second.firstLine
+                << "\" from " << request_parsed.hostname << endl;
+        pthread_mutex_unlock(&mutex);
+        string original_request_message_str = request_parsed.request_content;
+        char original_request_message[original_request_message_str.size() + 1];
+        strcpy(original_request_message, original_request_message_str.c_str());
+        send(server_fd, &original_request_message,
+             sizeof(original_request_message), MSG_NOSIGNAL);
+        get_from_server(client_fd, client_id, server_fd, request_parsed);
+      }
+    }
   }
 }
 
@@ -338,4 +389,85 @@ void Proxy::add_to_cache(Response_parser &response_parsed,
     cache.insert(
         pair<string, Response_parser>(request_parsed.url, response_parsed));
   }
+}
+
+int Proxy::revalidate(Response_parser &response_parsed, int server_fd,
+                      int client_id) {
+  int flag = (response_parsed.Etag == "" && response_parsed.LastModified == "");
+  if (flag)
+    return 1;
+
+  string updated_response_str = response_parsed.response_content;
+
+  if (response_parsed.Etag != "") {
+    string addEtag = "If-None-Match: " + response_parsed.Etag.append("\r\n");
+    updated_response_str =
+        updated_response_str.insert(updated_response_str.length() - 2, addEtag);
+  }
+  if (response_parsed.LastModified != "") {
+    string addLastModified =
+        "If-Modified-Since: " + response_parsed.LastModified.append("\r\n");
+    updated_response_str = updated_response_str.insert(
+        updated_response_str.length() - 2, addLastModified);
+  }
+  char new_request[updated_response_str.length() + 1];
+  strcpy(new_request, updated_response_str.c_str());
+  if (send(server_fd, &new_request, sizeof(new_request), MSG_NOSIGNAL) > 0) {
+    pthread_mutex_lock(&mutex);
+    cout << "send revalidation success from GET request" << endl;
+    pthread_mutex_unlock(&mutex);
+  }
+  char new_response_buffer[100000] = {0};
+  int new_response_buffer_len = recv(server_fd, &new_response_buffer,
+                                     sizeof(new_response_buffer), MSG_NOSIGNAL);
+  if (new_response_buffer_len <= 0) {
+    pthread_mutex_lock(&mutex);
+    cout << "receive revalidation failed from GET request" << endl;
+    pthread_mutex_unlock(&mutex);
+  }
+  string new_response_str(new_response_buffer, new_response_buffer_len);
+  int _200_OK = (new_response_str.find("HTTP/1.1 200 OK") != string::npos);
+  if (_200_OK) {
+    pthread_mutex_lock(&mutex);
+    logFile << client_id << ": in cache, requires validation" << endl;
+    pthread_mutex_unlock(&mutex);
+    return 0;
+  }
+  return 1;
+}
+
+int Proxy::check_expire(int server_fd, Parser_request &request_parsed,
+                        Response_parser &response_parsed, int client_id) {
+  time_t curr = time(0);
+  if (response_parsed.maxAge != -1) {
+    if (response_parsed.convertedDate + response_parsed.maxAge <= curr) {
+      cache.erase(request_parsed.url);
+      time_t expire_time =
+          response_parsed.convertedDate + response_parsed.maxAge;
+      struct tm *asc_time = gmtime(&expire_time);
+      const char *t = asctime(asc_time);
+      pthread_mutex_lock(&mutex);
+      logFile << client_id << ": in cache, but expired at " << t << endl;
+      pthread_mutex_unlock(&mutex);
+    }
+  }
+  if (response_parsed.convertedExpires != -1) {
+    if (curr > response_parsed.convertedExpires) {
+      cache.erase(request_parsed.url);
+      time_t expire_time = response_parsed.convertedExpires;
+      struct tm *asc_time = gmtime(&expire_time);
+      const char *t = asctime(asc_time);
+      pthread_mutex_lock(&mutex);
+      logFile << client_id << ": in cache, but expired at " << t << endl;
+      pthread_mutex_unlock(&mutex);
+    }
+  }
+  int pass_revalid = revalidate(response_parsed, server_fd, client_id);
+  if (!pass_revalid) {
+    return 0;
+  }
+  pthread_mutex_lock(&mutex);
+  logFile << client_id << ": in cache, valid" << endl;
+  pthread_mutex_unlock(&mutex);
+  return 1;
 }
