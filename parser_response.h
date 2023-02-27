@@ -24,13 +24,31 @@ public:
     time_t convertedExpires;
 
     Response_parser(const std::string& response) : response_content(response) {
+        if (response.empty()) {
+            // Handle empty response
+            status = "502 Bad Gateway";
+            response_content = "502 Bad Gateway";
+            return;
+        }
         // Split response into headers and body
         size_t pos = response.find("\r\n\r\n");
+        if (pos == std::string::npos) {
+            // Handle corrupted response
+            status = "502 Bad Gateway";
+            response_content = "502 Bad Gateway";
+            return;
+        }
         header = response.substr(0, pos);
         body = response.substr(pos + 4);
 
         // Parse status line
         pos = header.find("\r\n");
+        if (pos == std::string::npos) {
+            // Handle corrupted response
+            status = "502 Bad Gateway";
+            response_content = "502 Bad Gateway";
+            return;
+        }
         firstLine = header.substr(0, pos);
         header = header.substr(pos + 2);
         parseFirstLine();

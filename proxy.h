@@ -29,6 +29,7 @@ class Proxy {
     static void GET_request(int client_fd, int client_id, int server_fd, Parser_request & request_parsed);
     static void get_from_server(int client_fd, int client_id, int server_fd, Parser_request & request_parsed);
     static void add_to_cache(Response_parser & response_parsed, Parser_request & request_parsed, int no_store, int client_id);
-    static int revalidate(Response_parser & response_parsed, int server_fd, int client_id);
-    static int check_expire(int server_fd, Parser_request & request_parsed, Response_parser & response_parsed, int client_id);
+    static int revalidate(Response_parser & response_parsed, int server_fd, int client_id, int client_fd);
+    static int check_expire(int server_fd, Parser_request & request_parsed, Response_parser & response_parsed, int client_id, int client_fd);
+    static int check_502(Response_parser & response_parsed, int client_fd, int client_id);
 };

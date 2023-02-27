@@ -148,6 +148,11 @@ void Proxy::CONNECT_request(int client_fd, int client_id, int server_fd) {
     if (FD_ISSET(server_fd, &readfds)) {
       len_received_server = recv(server_fd, &received_server_message,
                                  sizeof(received_server_message), MSG_NOSIGNAL);
+      // check 502                          
+      string _502_checker_tmp(received_server_message);
+      Response_parser _502_checker(_502_checker_tmp);
+      if (check_502(_502_checker, client_fd, client_id)) return;
+
       if (len_received_server <= 0) {
         pthread_mutex_lock(&mutex);
         cout << "Fail to receive server message from tunnel" << endl;
@@ -199,6 +204,7 @@ void Proxy::POST_request(int client_fd, int client_id, int server_fd,
 
     string server_response_str = string(server_response_buffer);
     Response_parser parser_response(server_response_str);
+    if (check_502(parser_response, client_fd, client_id)) return;
     pthread_mutex_lock(&mutex);
     logFile << client_id << ": Received \"" << parser_response.firstLine
             << "\" from " << parser_request.hostname << endl;
@@ -233,7 +239,7 @@ void Proxy::GET_request(int client_fd, int client_id, int server_fd,
   } else { // found in cache
     int no_cache = (it->second.CacheControl.find("no-cache") != string::npos);
     if (no_cache) {
-      if (revalidate(it->second, server_fd, client_id)) {
+      if (revalidate(it->second, server_fd, client_id, client_fd)) {
         // ask server
         pthread_mutex_lock(&mutex);
         logFile << client_id << ": Requesting \"" << it->second.firstLine
@@ -258,7 +264,7 @@ void Proxy::GET_request(int client_fd, int client_id, int server_fd,
       }
     } else {
       int valid = check_expire(server_fd, request_parsed, it->second,
-                               client_id); // = check_time
+                               client_id, client_fd); // = check_time
       if (valid) {
         // use cache
         char cached_response[it->second.response_content.size() + 1];
@@ -299,6 +305,7 @@ void Proxy::get_from_server(int client_fd, int client_id, int server_fd,
   }
   string server_response_buffer_str(server_response_buffer);
   Response_parser response_parsed(server_response_buffer_str);
+  if (check_502(response_parsed, client_fd, client_id)) return;
   pthread_mutex_lock(&mutex);
   logFile << client_id << ": Received \"" << response_parsed.firstLine
           << "\" from " << request_parsed.hostname << endl;
@@ -319,6 +326,11 @@ void Proxy::get_from_server(int client_fd, int client_id, int server_fd,
     for (;;) {
       int remaining_chunk_len = recv(server_fd, &remaining_chunk,
                                      sizeof(remaining_chunk), MSG_NOSIGNAL);
+      // check 502
+      string _502_checker_str(remaining_chunk);
+      Response_parser _502_checker(_502_checker_str);
+      if (check_502(_502_checker, client_fd, client_id)) return;
+
       if (remaining_chunk_len <= 0) {
         return;
       }
@@ -393,7 +405,7 @@ void Proxy::add_to_cache(Response_parser &response_parsed,
 }
 
 int Proxy::revalidate(Response_parser &response_parsed, int server_fd,
-                      int client_id) {
+                      int client_id, int client_fd) {
   int flag = (response_parsed.Etag == "" && response_parsed.LastModified == "");
   if (flag)
     return 1;
@@ -421,6 +433,10 @@ int Proxy::revalidate(Response_parser &response_parsed, int server_fd,
   char new_response_buffer[100000] = {0};
   int new_response_buffer_len = recv(server_fd, &new_response_buffer,
                                      sizeof(new_response_buffer), MSG_NOSIGNAL);
+  // check 502
+  string _502_checker_str(new_response_buffer);
+  Response_parser _502_checker_new_response(_502_checker_str);
+  if (check_502(_502_checker_new_response, client_fd, client_id)) return 0;
   if (new_response_buffer_len <= 0) {
     pthread_mutex_lock(&mutex);
     cout << "receive revalidation failed from GET request" << endl;
@@ -438,7 +454,7 @@ int Proxy::revalidate(Response_parser &response_parsed, int server_fd,
 }
 
 int Proxy::check_expire(int server_fd, Parser_request &request_parsed,
-                        Response_parser &response_parsed, int client_id) {
+                        Response_parser &response_parsed, int client_id, int client_fd) {
   time_t curr = time(0);
   if (response_parsed.maxAge != -1) {
     if (response_parsed.convertedDate + response_parsed.maxAge <= curr) {
@@ -463,7 +479,7 @@ int Proxy::check_expire(int server_fd, Parser_request &request_parsed,
       pthread_mutex_unlock(&mutex);
     }
   }
-  int pass_revalid = revalidate(response_parsed, server_fd, client_id);
+  int pass_revalid = revalidate(response_parsed, server_fd, client_id, client_fd);
   if (!pass_revalid) {
     return 0;
   }
@@ -471,4 +487,19 @@ int Proxy::check_expire(int server_fd, Parser_request &request_parsed,
   logFile << client_id << ": in cache, valid" << endl;
   pthread_mutex_unlock(&mutex);
   return 1;
+}
+
+int Proxy::check_502(Response_parser &response_parsed, int client_fd,
+                     int client_id) {
+  if (response_parsed.status == "502 Bad Gateway") {
+    string _502_message_str = "HTTP/1.1 502 Bad Gateway";
+    char _502_message[_502_message_str.size() + 1];
+    strcpy(_502_message, _502_message_str.c_str());
+    send(client_fd, &_502_message, sizeof(_502_message), MSG_NOSIGNAL);
+    pthread_mutex_lock(&mutex);
+    logFile << client_id << ": Responding " << _502_message_str << endl;
+    pthread_mutex_unlock(&mutex);
+    return 1;
+  }
+  return 0;
 }
