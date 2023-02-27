@@ -1,4 +1,4 @@
-#include "parser_request.hpp"
+#include "parser_request.h"
 
 #include <cstring>
 #include <string>
@@ -6,7 +6,7 @@
 using namespace std;
 
 #include <cstring>
-#include "parser_response.hpp"
+#include "parser_response.h"
 
 void printFields(const Parser_request& p) {
     std::cout << "Method: " << p.method << "\n";

@@ -8,15 +8,15 @@
 #include <unordered_map>
 #include <vector>
 
-#include "utils.hpp"
-#include "response.hpp"
+#include "utils.h"
+#include "response.h"
 
 
 class Proxy {
     private:
         const char * port;
     public:
-        static unordered_map<string, Response_parser> cache;
+        // static unordered_map<string, Response_parser> cache;
         int proxy_fd;
     
     Proxy(const char * port) : port(port) {}

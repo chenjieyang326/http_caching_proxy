@@ -1,4 +1,4 @@
-#include "utils.hpp"
+#include "utils.h"
 #include <sys/socket.h>
 
 using namespace std;
@@ -122,7 +122,7 @@ string receive_complete_message(int sender_fd, string & sender_message, int cont
   return sender_message;
 }
 
-int get_remaining_len(Response_parser & parsed_response, int response_len) {
+int get_remaining_length(Response_parser & parsed_response, int response_len) {
   if (parsed_response.content_len != -1) {
     int head_end = parsed_response.response_content.find("\r\n\r\n");
     int body_len = response_len - head_end - 8;

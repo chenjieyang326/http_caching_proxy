@@ -9,8 +9,8 @@
 
 #include <vector>
 
-#include "parser_response.hpp"
-#include "parser_request.hpp"
+#include "parser_response.h"
+#include "parser_request.h"
 using namespace std;
 
 int server_setup(const char *port);

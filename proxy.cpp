@@ -11,13 +11,14 @@
 #include <sys/socket.h>
 #include <unordered_map>
 
-#include "client.hpp"
-#include "proxy.hpp"
+#include "client.h"
+#include "proxy.h"
 
 using namespace std;
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 ofstream logFile("/var/log/erss/proxy.log");
+static unordered_map<string, Response_parser> cache;
 
 string getCurrTime() {
   time_t now = std::time(nullptr);
