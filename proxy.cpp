@@ -1,22 +1,18 @@
-#include <pthread.h>
-#include <stdio.h>
-#include <string.h>
-
 #include <cstring>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
 #include <map>
+#include <pthread.h>
 #include <sstream>
+#include <stdio.h>
+#include <string.h>
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <unordered_map>
-#include <vector>
 
 #include "client.hpp"
-#include "parser_response.hpp"
 #include "proxy.hpp"
-#include "utils.hpp"
 
 using namespace std;
 
@@ -88,10 +84,12 @@ void *Proxy::handle(void *input) {
     int server_fd = client_setup(request_hostname, port);
     if (request_parsed.method == "GET") {
       // handle GET request
+      GET_request(client_fd, client_id, server_fd, request_parsed);
     } else if (request_parsed.method == "POST") {
       // handle POST request
-      POST_request(client_fd, client_id, server_fd,
-                   request_parsed.headers["Content-Length"], request_parsed);
+      int content_len = get_remaining_length(request_parsed, len);
+      POST_request(client_fd, client_id, server_fd, content_len,
+                   request_parsed);
     } else {
       // handle CONNECT request
       CONNECT_request(client_fd, client_id, server_fd);
@@ -169,15 +167,14 @@ void Proxy::CONNECT_request(int client_fd, int client_id, int server_fd) {
   }
 }
 
-void POST_request(int client_fd, int client_id, int server_fd,
-                  const string &content_length,
-                  const Parser_request &parser_request) {
+void Proxy::POST_request(int client_fd, int client_id, int server_fd,
+                         int content_len,
+                         const Parser_request &parser_request) {
   pthread_mutex_lock(&mutex);
   logFile << client_id << ": "
           << "Requesting \"" << parser_request.first_line << "\" from "
           << parser_request.hostname << endl;
   pthread_mutex_unlock(&mutex);
-  int content_len = stoi(content_length);
   if (content_len == -1) {
     cout << "Cannot get request content length in POST request" << endl;
     return;
@@ -206,9 +203,139 @@ void POST_request(int client_fd, int client_id, int server_fd,
             << "\" from " << parser_request.hostname << endl;
     pthread_mutex_unlock(&mutex);
 
-    send(client_fd, &server_response_buffer, sizeof(server_response_buffer), MSG_NOSIGNAL);
+    send(client_fd, &server_response_buffer, sizeof(server_response_buffer),
+         MSG_NOSIGNAL);
     pthread_mutex_lock(&mutex);
-    logFile << client_id << ": Responding \"" << parser_response.firstLine << endl;
+    logFile << client_id << ": Responding \"" << parser_response.firstLine
+            << endl;
     pthread_mutex_unlock(&mutex);
+  }
+}
+
+void Proxy::GET_request(int client_fd, int client_id, int server_fd,
+                        Parser_request &request_parsed) {
+  string request_url = request_parsed.url;
+  unordered_map<string, Response_parser>::iterator it = cache.find(request_url);
+  if (it == cache.end()) { // not found in cache
+    pthread_mutex_lock(&mutex);
+    logFile << client_id << ": not in cache" << endl;
+    pthread_mutex_unlock(&mutex);
+    pthread_mutex_lock(&mutex);
+    logFile << client_id << ": Requesting \"" << request_parsed.first_line
+            << "\" from " << request_parsed.hostname << endl;
+    pthread_mutex_unlock(&mutex);
+    string request_message_str = request_parsed.request_content;
+    char request_message[100000];
+    strcpy(request_message, request_message_str.c_str());
+    send(server_fd, &request_message, sizeof(request_message), MSG_NOSIGNAL);
+    get_from_server(client_fd, client_id, server_fd, request_parsed);
+  } else { // found in cache
+    
+  }
+}
+
+void Proxy::get_from_server(int client_fd, int client_id, int server_fd,
+                            Parser_request &request_parsed) {
+  char server_response_buffer[100000] = {0};
+  int server_response_buffer_len =
+      recv(server_fd, &server_response_buffer, sizeof(server_response_buffer),
+           MSG_NOSIGNAL);
+  if (server_response_buffer_len <= 0) {
+    cout << "Fail to receive response from server in GET request (not in cache)"
+         << endl;
+    return;
+  }
+  string server_response_buffer_str(server_response_buffer);
+  Response_parser response_parsed(server_response_buffer_str);
+  pthread_mutex_lock(&mutex);
+  logFile << client_id << ": Received \"" << response_parsed.firstLine
+          << "\" from " << request_parsed.hostname << endl;
+
+  pthread_mutex_unlock(&mutex);
+  int is_chunk =
+      (response_parsed.response_content.find("chunked") != string::npos);
+
+  if (is_chunk) {
+    pthread_mutex_lock(&mutex);
+    cout << client_id << ": not cacheable because it is chunked" << endl;
+    pthread_mutex_unlock(&mutex);
+    // send first chunk to client
+    send(client_fd, &server_response_buffer, sizeof(server_response_buffer),
+         MSG_NOSIGNAL);
+    // send rest
+    char remaining_chunk[100000] = {0};
+    for (;;) {
+      int remaining_chunk_len = recv(server_fd, &remaining_chunk,
+                                     sizeof(remaining_chunk), MSG_NOSIGNAL);
+      if (remaining_chunk_len <= 0) {
+        return;
+      }
+      send(client_fd, &remaining_chunk, sizeof(remaining_chunk), MSG_NOSIGNAL);
+    }
+  } else {
+    int no_store =
+        (response_parsed.response_content.find("no-store") != string::npos);
+    // can log cache control
+    // log_cache_control();
+    int content_len =
+        get_remaining_length(response_parsed, server_response_buffer_len);
+    if (content_len != -1) {
+      string sender_message = response_parsed.response_content;
+      string complete_response =
+          receive_complete_message(server_fd, sender_message, content_len);
+      response_parsed.response_content = complete_response;
+      char response_to_send[complete_response.length() + 1];
+      strcpy(response_to_send, complete_response.c_str());
+      send(client_fd, &response_to_send, sizeof(response_to_send),
+           MSG_NOSIGNAL);
+    } else {
+      char response_to_send[response_parsed.response_content.length() + 1];
+      strcpy(response_to_send, response_parsed.response_content.c_str());
+      send(client_fd, &response_to_send, sizeof(response_to_send),
+           MSG_NOSIGNAL);
+    }
+    add_to_cache(response_parsed, request_parsed, no_store, client_id);
+  }
+  pthread_mutex_lock(&mutex);
+  logFile << client_id << ": Responding \"" << response_parsed.firstLine << "\""
+          << endl;
+  pthread_mutex_unlock(&mutex);
+}
+
+void Proxy::add_to_cache(Response_parser &response_parsed,
+                         Parser_request &request_parsed, int no_store,
+                         int client_id) {
+  int _200_OK = (response_parsed.response_content.find("HTTP/1.1 200 OK") !=
+                 string::npos);
+  if (_200_OK) {
+    if (no_store) {
+      pthread_mutex_lock(&mutex);
+      logFile << client_id << ": not cacheable because no-store" << endl;
+      pthread_mutex_unlock(&mutex);
+      return;
+    } else {
+      if (response_parsed.maxAge != -1) {
+        time_t expire_time =
+            response_parsed.convertedDate + response_parsed.maxAge;
+        struct tm *asc_time = gmtime(&expire_time);
+        const char *t = asctime(asc_time);
+        pthread_mutex_lock(&mutex);
+        logFile << client_id << ": cached, expires at " << t << endl;
+        pthread_mutex_unlock(&mutex);
+      } else if (response_parsed.convertedExpires != -1) {
+        time_t expire_time = response_parsed.convertedExpires;
+        struct tm *asc_time = gmtime(&expire_time);
+        const char *t = asctime(asc_time);
+        pthread_mutex_lock(&mutex);
+        logFile << client_id << ": cached, expires at " << t << endl;
+        pthread_mutex_unlock(&mutex);
+      }
+    }
+    if (cache.size() >= 20) {
+      unordered_map<string, Response_parser>::iterator it = cache.begin();
+      cache.erase(it);
+    }
+    cache.insert(
+        pair<string, Response_parser>(request_parsed.url, response_parsed));
   }
 }

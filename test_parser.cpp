@@ -93,7 +93,10 @@ int main() {
     Response_parser parser(response);
     
     // Print out all fields
-    printResponseFields(parser);
-    
+    // printResponseFields(parser);
+    cout << parser.Etag << endl;
+    cout << parser.CacheControl << endl; 
+    cout << parser.Expires << endl;
+    cout << parser.date << endl;
     return 0;
 }

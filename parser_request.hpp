@@ -48,6 +48,7 @@ public:
 
     // Parse the headers and store them in the headers field
     std::size_t pos = newlinePos + 1;
+    headers["Content-Length"] = -1;
     while (pos < request.length() - 1) {
       std::size_t endlinePos = request.find('\n', pos);
       std::size_t colonPos = request.find(':', pos);

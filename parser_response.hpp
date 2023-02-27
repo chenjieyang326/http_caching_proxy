@@ -6,6 +6,7 @@
 
 class Response_parser {
 public:
+    std::string response_content;
     std::string status;
     std::string date;
     std::string ContentType;
@@ -22,7 +23,7 @@ public:
     time_t convertedDate;
     time_t convertedExpires;
 
-    Response_parser(const std::string& response) {
+    Response_parser(const std::string& response) : response_content(response) {
         // Split response into headers and body
         size_t pos = response.find("\r\n\r\n");
         header = response.substr(0, pos);
@@ -49,6 +50,7 @@ private:
         std::unordered_map<std::string, std::string> headers_map;
         std::string line;
         std::istringstream header_stream(header);
+        headers_map["Content-Length"] = "-1";
         while (std::getline(header_stream, line)) {
             if (line.back() == '\r') {
                 line.pop_back();
@@ -82,8 +84,8 @@ private:
             convertedExpires = mktime(&tm);
             maxAge = difftime(convertedExpires, convertedDate);
         } else {
-            convertedExpires = 0;
-            maxAge = 0;
+            convertedExpires = -1;
+            maxAge = -1;
         }
     }
 };

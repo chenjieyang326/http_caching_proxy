@@ -121,3 +121,22 @@ string receive_complete_message(int sender_fd, string & sender_message, int cont
   }
   return sender_message;
 }
+
+int get_remaining_len(Response_parser & parsed_response, int response_len) {
+  if (parsed_response.content_len != -1) {
+    int head_end = parsed_response.response_content.find("\r\n\r\n");
+    int body_len = response_len - head_end - 8;
+    return parsed_response.content_len - body_len - 4;
+  }
+  else return -1;
+}
+
+int get_remaining_length(Parser_request & parsed_request, int request_len) {
+  if (parsed_request.headers["Content-Length"] != "-1") {
+    int head_end = parsed_request.request_content.find("\r\n\r\n");
+    int body_len = request_len - head_end - 8;
+    return stoi(parsed_request.headers["Content-Length"]) - body_len - 4;
+  }
+  else return -1;
+}
+
