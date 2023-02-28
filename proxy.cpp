@@ -205,7 +205,9 @@ void Proxy::POST_request(int client_fd, int client_id, int server_fd,
           << parser_request.url << endl;
   pthread_mutex_unlock(&mutex);
   if (content_len == -1) {
+    pthread_mutex_lock(&mutex);
     cout << "Cannot get request content length in POST request" << endl;
+    pthread_mutex_unlock(&mutex);
     return;
   } else {
     string request_content = parser_request.request_content;
@@ -221,10 +223,11 @@ void Proxy::POST_request(int client_fd, int client_id, int server_fd,
         recv(server_fd, &server_response_buffer, sizeof(server_response_buffer),
              MSG_NOSIGNAL);
     if (server_response_len <= 0) {
+      pthread_mutex_lock(&mutex);
       cout << "Cannot receive server response from POST request" << endl;
+      pthread_mutex_unlock(&mutex);
       return;
     }
-
     string server_response_str = string(server_response_buffer);
     Response_parser parser_response(server_response_str);
     if (check_502(parser_response, client_fd, client_id))
@@ -246,7 +249,8 @@ void Proxy::POST_request(int client_fd, int client_id, int server_fd,
 void Proxy::GET_request(int client_fd, int client_id, int server_fd,
                         Parser_request &request_parsed) {
   string request_url = request_parsed.url;
-  unordered_map<string, Response_parser>::iterator it = cache.find(request_url);
+  unordered_map<string, Response_parser>::iterator it = cache.begin();
+  it = cache.find(request_url);
   if (it == cache.end()) { // not found in cache
     pthread_mutex_lock(&mutex);
     logFile << client_id << ": not in cache" << endl;
@@ -263,7 +267,7 @@ void Proxy::GET_request(int client_fd, int client_id, int server_fd,
   } else { // found in cache
     int no_cache = (it->second.CacheControl.find("no-cache") != string::npos);
     if (no_cache) {
-      if (revalidate(it->second, server_fd, client_id, client_fd)) {
+      if (!revalidate(it->second, server_fd, client_id, client_fd)) {
         // ask server
         pthread_mutex_lock(&mutex);
         logFile << client_id << ": Requesting \"" << it->second.firstLine
@@ -348,9 +352,12 @@ void Proxy::get_from_server(int client_fd, int client_id, int server_fd,
          MSG_NOSIGNAL);
     // send rest
     char remaining_chunk[28000] = {0};
+    int chunk_id = 0;
     for (;;) {
       int remaining_chunk_len = recv(server_fd, &remaining_chunk,
                                      sizeof(remaining_chunk), MSG_NOSIGNAL);
+      cout << chunk_id <<": get remaining chunk len: " << remaining_chunk_len << endl;
+      chunk_id++;
       if (remaining_chunk_len <= 0) {
         break;
       }
@@ -494,15 +501,16 @@ int Proxy::check_expire(int server_fd, Parser_request &request_parsed,
                         int client_fd) {
   time_t curr = time(0);
   if (response_parsed.maxAge != -1) {
-    if (response_parsed.convertedDate + response_parsed.maxAge <= curr) {
+    if (response_parsed.convertedDate + response_parsed.maxAge < curr) {
       cache.erase(request_parsed.url);
       time_t expire_time =
           response_parsed.convertedDate + response_parsed.maxAge;
       struct tm *asc_time = gmtime(&expire_time);
       const char *t = asctime(asc_time);
       pthread_mutex_lock(&mutex);
-      logFile << client_id << ": in cache, but expired at " << t << endl;
+      logFile << client_id << ": in cache, but expired at " << t;
       pthread_mutex_unlock(&mutex);
+      return 0;
     }
   }
   if (response_parsed.convertedExpires != -1) {
@@ -512,8 +520,9 @@ int Proxy::check_expire(int server_fd, Parser_request &request_parsed,
       struct tm *asc_time = gmtime(&expire_time);
       const char *t = asctime(asc_time);
       pthread_mutex_lock(&mutex);
-      logFile << client_id << ": in cache, but expired at " << t << endl;
+      logFile << client_id << ": in cache, but expired at " << t;
       pthread_mutex_unlock(&mutex);
+      return 0;
     }
   }
   int pass_revalid =

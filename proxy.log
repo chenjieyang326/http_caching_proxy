@@ -1,18 +1,10 @@
-0: "GET http://httpbin.org/forms/post HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 10:06:25 2023
+0: "GET http://httpbin.org/forms/post HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 11:08:38 2023
 0: not in cache
 0: Requesting "GET http://httpbin.org/forms/post HTTP/1.1" from http://httpbin.org/forms/post
 0: Received "HTTP/1.1 200 OK" from http://httpbin.org/forms/post
-0: cached, expires at Tue Feb 28 15:06:25 2023
+0: cached, expires at Tue Feb 28 16:08:38 2023
 0: Responding "HTTP/1.1 200 OK"
-1: "POST http://httpbin.org/post HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 10:06:34 2023
+1: "POST http://httpbin.org/post HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 11:08:46 2023
 1: Requesting "POST http://httpbin.org/post HTTP/1.1" from http://httpbin.org/post
 1: Received "HTTP/1.1 200 OK" from http://httpbin.org/post
 1: Responding "HTTP/1.1 200 OK
-2: "POST http://httpbin.org/post HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 10:06:42 2023
-2: Requesting "POST http://httpbin.org/post HTTP/1.1" from http://httpbin.org/post
-2: Received "HTTP/1.1 200 OK" from http://httpbin.org/post
-2: Responding "HTTP/1.1 200 OK
-3: "POST http://httpbin.org/post HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 10:06:48 2023
-3: Requesting "POST http://httpbin.org/post HTTP/1.1" from http://httpbin.org/post
-3: Received "HTTP/1.1 200 OK" from http://httpbin.org/post
-3: Responding "HTTP/1.1 200 OK
