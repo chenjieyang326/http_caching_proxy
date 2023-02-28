@@ -30,22 +30,26 @@ string getCurrTime() {
 void Proxy::run() {
   proxy_fd = server_setup(port);
   if (proxy_fd == -1) {
+    pthread_mutex_lock(&mutex);
     cout << "Unable to create proxy socket" << endl;
+    pthread_mutex_unlock(&mutex);
     return;
   }
   int client_id = 0;
+  int client_fd;
   for (;;) {
-    int client_fd;
     string client_ip;
-    client_fd = server_accept(proxy_fd, client_ip);
+    client_fd = server_accept(proxy_fd, &client_ip);
     if (client_fd == -1) {
+      pthread_mutex_lock(&mutex);
       cout << "Errorr in connecting client" << endl;
+      pthread_mutex_unlock(&mutex);
       continue;
     }
     pthread_t thread;
     pthread_mutex_lock(&mutex);
     Client *client = new Client(client_fd, client_id, client_ip);
-    //client_id++;
+    // client_id++;
     cout << "client connected as client: " << client_id << endl;
     client_id++;
     pthread_mutex_unlock(&mutex);
@@ -58,55 +62,58 @@ void *Proxy::handle(void *input) {
   int client_fd = client->client_fd;
   int client_id = client->client_id;
   string client_ip = client->client_ip;
-  cout << "client ip is: " << client_ip << endl;
+  // cout << "client ip is: " << client_ip << endl;
   char request_message[65536] = {0};
   int len = recv(client_fd, &request_message, sizeof(request_message), 0);
   cout << "received request with len: " << len << endl;
   if (len <= 0) {
     pthread_mutex_lock(&mutex);
-    cout << client_id << "Invalid Request" << endl;
+    cout << client_id << ": Invalid Request" << endl;
     pthread_mutex_unlock(&mutex);
     return NULL;
   }
+  string request_message_str(request_message);
+  if (request_message_str == "" || request_message_str == "\r" ||
+      request_message_str == "\n" || request_message_str == "\r\n")
+    return NULL;
   string request_content(request_message, len);
-  cout << "request content is: " << request_message << endl;
-  Parser_request request_parsed(request_content);
-  pthread_mutex_lock(&mutex);
-  cout << "current request is: " << request_parsed.first_line << endl;
-  cout << "host name is: " << request_parsed.hostname << endl;
-  cout << "port number is: " << request_parsed.port << endl;
-  cout << "Content-len is: " << request_parsed.headers["Content-Length"]
-       << endl;
-  pthread_mutex_unlock(&mutex);
-  pthread_mutex_lock(&mutex);
-  logFile << client_id << ": \"" << request_parsed.first_line << "\" from "
-          << client_ip << " @ " << getCurrTime().append("\0") << endl;
-  pthread_mutex_unlock(&mutex);
-  if (request_parsed.method != "GET" && request_parsed.method != "POST" &&
-      request_parsed.method != "CONNECT") {
+  Parser_request *request_parsed = new Parser_request(request_content);
+  if (request_parsed->method != "GET" && request_parsed->method != "POST" &&
+      request_parsed->method != "CONNECT") {
     const char _400_Bad_Request[100] = "HTTP/1.1 400 Bad Request";
     send(client_fd, &_400_Bad_Request, sizeof(_400_Bad_Request), MSG_NOSIGNAL);
     pthread_mutex_lock(&mutex);
     logFile << client_id << ": Responding \"HTTP/1.1 400 Bad Request\""
             << std::endl;
     pthread_mutex_unlock(&mutex);
-  } else {
-    const char *request_hostname = request_parsed.hostname.c_str();
-    const char *port = request_parsed.port.c_str();
-    int server_fd = client_setup(request_hostname, port);
-    if (request_parsed.method == "GET") {
-      // handle GET request
-      GET_request(client_fd, client_id, server_fd, request_parsed);
-    } else if (request_parsed.method == "POST") {
-      // handle POST request
-      int content_len = get_remaining_length(request_parsed, len);
-      POST_request(client_fd, client_id, server_fd, content_len,
-                   request_parsed);
-    } else {
-      // handle CONNECT request
-      CONNECT_request(client_fd, client_id, server_fd);
-    }
+    return NULL;
   }
+  pthread_mutex_lock(&mutex);
+  logFile << client_id << ": \"" << request_parsed->first_line << "\" from "
+          << client_ip << " @ " << getCurrTime().append("\0") << endl;
+  pthread_mutex_unlock(&mutex);
+  const char *request_hostname = request_parsed->hostname.c_str();
+  const char *port = request_parsed->port.c_str();
+  int server_fd = client_setup(request_hostname, port);
+  if (server_fd == -1) {
+    pthread_mutex_lock(&mutex);
+    cout << "Failed in connecting server" << endl;
+    pthread_mutex_unlock(&mutex);
+    return NULL;
+  }
+  if (request_parsed->method == "GET") {
+    // handle GET request
+    GET_request(client_fd, client_id, server_fd, *request_parsed);
+  } else if (request_parsed->method == "POST") {
+    // handle POST request
+    int content_len = get_remaining_length(*request_parsed, len);
+    POST_request(client_fd, client_id, server_fd, content_len, *request_parsed);
+  } else {
+    // handle CONNECT request
+    CONNECT_request(client_fd, client_id, server_fd);
+  }
+  close(server_fd);
+  close(client_fd);
   return NULL;
 }
 
@@ -161,9 +168,14 @@ void Proxy::CONNECT_request(int client_fd, int client_id, int server_fd) {
       // check 502
       string _502_checker_tmp(received_server_message);
       Response_parser _502_checker(_502_checker_tmp);
-      if (check_502(_502_checker, client_fd, client_id))
+      if (check_502(_502_checker, client_fd, client_id)){
+        pthread_mutex_lock(&mutex);
+        cout << "Responding 502" << endl;
+        logFile << client_id << ": Tunnel closed" << std::endl;
+        pthread_mutex_unlock(&mutex);
         return;
-
+      }
+        
       if (len_received_server <= 0) {
         pthread_mutex_lock(&mutex);
         cout << "Fail to receive server message from tunnel" << endl;
@@ -342,8 +354,7 @@ void Proxy::get_from_server(int client_fd, int client_id, int server_fd,
       if (remaining_chunk_len <= 0) {
         break;
       }
-      send(client_fd, &remaining_chunk, sizeof(remaining_chunk),
-      MSG_NOSIGNAL);
+      send(client_fd, &remaining_chunk, sizeof(remaining_chunk), MSG_NOSIGNAL);
     }
     // string complete_message(server_response_buffer);
     // for (;;) {
@@ -357,7 +368,8 @@ void Proxy::get_from_server(int client_fd, int client_id, int server_fd,
     // }
     // char complete_message_to_send[complete_message.size() + 1];
     // strcpy(complete_message_to_send, complete_message.c_str());
-    // send(client_fd, &complete_message_to_send, sizeof(complete_message_to_send),
+    // send(client_fd, &complete_message_to_send,
+    // sizeof(complete_message_to_send),
     //      MSG_NOSIGNAL);
   } else {
     int no_store =

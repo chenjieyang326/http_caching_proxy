@@ -93,7 +93,7 @@ int client_setup(const char * hostname, const char * port) {
 }
 
 // Code derived from Prof. Rogers TCP example, updated by the group
-int server_accept(int socket_fd, string & ip) {
+int server_accept(int socket_fd, string * ip) {
   struct sockaddr_storage socket_addr;
   socklen_t socket_addr_len = sizeof(socket_addr);
   int client_connection_fd;
@@ -103,7 +103,7 @@ int server_accept(int socket_fd, string & ip) {
     return -1;
   } //if
   struct sockaddr_in * addr = (struct sockaddr_in *)&socket_addr;
-  ip = inet_ntoa(addr->sin_addr);
+  *ip = inet_ntoa(addr->sin_addr);
   cout << "connect client success" << endl;
   return client_connection_fd;
 }
@@ -136,8 +136,8 @@ int get_remaining_length(Response_parser & parsed_response, int response_len) {
 int get_remaining_length(Parser_request & parsed_request, int request_len) {
   if (parsed_request.headers["Content-Length"] != "-1") {
     int head_end = parsed_request.request_content.find("\r\n\r\n");
-    int body_len = request_len - head_end - 8;
-    return stoi(parsed_request.headers["Content-Length"]) - body_len - 4;
+    int body_len = request_len - head_end - 4;
+    return stoi(parsed_request.headers["Content-Length"]) - body_len;
   }
   else return -1;
 }
