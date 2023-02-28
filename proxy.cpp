@@ -74,7 +74,8 @@ void *Proxy::handle(void *input) {
   cout << "current request is: " << request_parsed.first_line << endl;
   cout << "host name is: " << request_parsed.hostname << endl;
   cout << "port number is: " << request_parsed.port << endl;
-  cout << "Content-len is: " << request_parsed.headers["Content-Length"] << endl;
+  cout << "Content-len is: " << request_parsed.headers["Content-Length"]
+       << endl;
   pthread_mutex_unlock(&mutex);
   pthread_mutex_lock(&mutex);
   logFile << client_id << ": \"" << request_parsed.first_line << "\" from "
@@ -156,10 +157,11 @@ void Proxy::CONNECT_request(int client_fd, int client_id, int server_fd) {
     if (FD_ISSET(server_fd, &readfds)) {
       len_received_server = recv(server_fd, &received_server_message,
                                  sizeof(received_server_message), MSG_NOSIGNAL);
-      // check 502                          
+      // check 502
       string _502_checker_tmp(received_server_message);
       Response_parser _502_checker(_502_checker_tmp);
-      if (check_502(_502_checker, client_fd, client_id)) return;
+      if (check_502(_502_checker, client_fd, client_id))
+        return;
 
       if (len_received_server <= 0) {
         pthread_mutex_lock(&mutex);
@@ -212,7 +214,8 @@ void Proxy::POST_request(int client_fd, int client_id, int server_fd,
 
     string server_response_str = string(server_response_buffer);
     Response_parser parser_response(server_response_str);
-    if (check_502(parser_response, client_fd, client_id)) return;
+    if (check_502(parser_response, client_fd, client_id))
+      return;
     pthread_mutex_lock(&mutex);
     logFile << client_id << ": Received \"" << parser_response.firstLine
             << "\" from " << parser_request.hostname << endl;
@@ -271,8 +274,8 @@ void Proxy::GET_request(int client_fd, int client_id, int server_fd,
         pthread_mutex_unlock(&mutex);
       }
     } else {
-      int valid = check_expire(server_fd, request_parsed, it->second,
-                               client_id, client_fd); // = check_time
+      int valid = check_expire(server_fd, request_parsed, it->second, client_id,
+                               client_fd); // = check_time
       if (valid) {
         // use cache
         char cached_response[it->second.response_content.size() + 1];
@@ -313,7 +316,8 @@ void Proxy::get_from_server(int client_fd, int client_id, int server_fd,
   }
   string server_response_buffer_str(server_response_buffer);
   Response_parser response_parsed(server_response_buffer_str);
-  if (check_502(response_parsed, client_fd, client_id)) return;
+  if (check_502(response_parsed, client_fd, client_id))
+    return;
   pthread_mutex_lock(&mutex);
   logFile << client_id << ": Received \"" << response_parsed.firstLine
           << "\" from " << request_parsed.hostname << endl;
@@ -330,27 +334,30 @@ void Proxy::get_from_server(int client_fd, int client_id, int server_fd,
     send(client_fd, &server_response_buffer, sizeof(server_response_buffer),
          MSG_NOSIGNAL);
     // send rest
-    char remaining_chunk[100000] = {0};
+    char remaining_chunk[28000] = {0};
     for (;;) {
       int remaining_chunk_len = recv(server_fd, &remaining_chunk,
                                      sizeof(remaining_chunk), MSG_NOSIGNAL);
-      cout << "------------------received remaining chunk with len: " << remaining_chunk_len << endl;
-      cout << "remaining chunk is:" << endl << remaining_chunk << endl;
-      // check 502
-      // string _502_checker_str(remaining_chunk);
-      // Response_parser _502_checker(_502_checker_str);
-      // if (check_502(_502_checker, client_fd, client_id)) {
-      //     cout << "------------------in chunked remaining message, 502------------------" << endl;
-      //     return;
-      // }
-      
-
       if (remaining_chunk_len <= 0) {
-        cout << "-----------------finished loading chunked message-----------------" << endl;
         break;
       }
-      send(client_fd, &remaining_chunk, sizeof(remaining_chunk), MSG_NOSIGNAL);
+      send(client_fd, &remaining_chunk, sizeof(remaining_chunk),
+      MSG_NOSIGNAL);
     }
+    // string complete_message(server_response_buffer);
+    // for (;;) {
+    //   char remaining_chunk[100000] = {0};
+    //   int remaining_chunk_len = recv(server_fd, &remaining_chunk,
+    //                                  sizeof(remaining_chunk), MSG_NOSIGNAL);
+    //   if (remaining_chunk_len <= 0)
+    //     break;
+    //   string new_chunk(remaining_chunk);
+    //   complete_message += new_chunk;
+    // }
+    // char complete_message_to_send[complete_message.size() + 1];
+    // strcpy(complete_message_to_send, complete_message.c_str());
+    // send(client_fd, &complete_message_to_send, sizeof(complete_message_to_send),
+    //      MSG_NOSIGNAL);
   } else {
     int no_store =
         (response_parsed.response_content.find("no-store") != string::npos);
@@ -451,7 +458,8 @@ int Proxy::revalidate(Response_parser &response_parsed, int server_fd,
   // check 502
   string _502_checker_str(new_response_buffer);
   Response_parser _502_checker_new_response(_502_checker_str);
-  if (check_502(_502_checker_new_response, client_fd, client_id)) return 0;
+  if (check_502(_502_checker_new_response, client_fd, client_id))
+    return 0;
   if (new_response_buffer_len <= 0) {
     pthread_mutex_lock(&mutex);
     cout << "receive revalidation failed from GET request" << endl;
@@ -469,7 +477,8 @@ int Proxy::revalidate(Response_parser &response_parsed, int server_fd,
 }
 
 int Proxy::check_expire(int server_fd, Parser_request &request_parsed,
-                        Response_parser &response_parsed, int client_id, int client_fd) {
+                        Response_parser &response_parsed, int client_id,
+                        int client_fd) {
   time_t curr = time(0);
   if (response_parsed.maxAge != -1) {
     if (response_parsed.convertedDate + response_parsed.maxAge <= curr) {
@@ -494,7 +503,8 @@ int Proxy::check_expire(int server_fd, Parser_request &request_parsed,
       pthread_mutex_unlock(&mutex);
     }
   }
-  int pass_revalid = revalidate(response_parsed, server_fd, client_id, client_fd);
+  int pass_revalid =
+      revalidate(response_parsed, server_fd, client_id, client_fd);
   if (!pass_revalid) {
     return 0;
   }
