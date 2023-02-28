@@ -55,6 +55,7 @@ public:
     hostname = url.substr(hostStart, hostEnd - hostStart);
 
     // Parse the headers and store them in the headers field
+    if (method != "POST" && method != "GET" && method != "CONNECT") return;
     if (method != "POST") {
       std::size_t pos = newlinePos + 1;
       headers["Content-Length"] = "-1";
