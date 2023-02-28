@@ -1,0 +1,6 @@
+0: "GET http://httpbin.org/forms/post HTTP/1.1" from 173.95.91.85 @ Tue, 28 Feb 2023 01:46:51 GMT0: not in cache
+0: Requesting "GET http://httpbin.org/forms/post HTTP/1.1" from httpbin.org
+0: Received "HTTP/1.1 200 OK" from httpbin.org
+0: cached, expires at Tue Feb 28 06:46:51 2023
+
+0: Responding "HTTP/1.1 200 OK"

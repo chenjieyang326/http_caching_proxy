@@ -17,7 +17,7 @@
 using namespace std;
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-ofstream logFile("/var/log/erss/proxy.log");
+ofstream logFile("proxy.log");
 static unordered_map<string, Response_parser> cache;
 
 string getCurrTime() {
@@ -46,6 +46,7 @@ void Proxy::run() {
     pthread_mutex_lock(&mutex);
     Client *client = new Client(client_fd, client_id, client_ip);
     client_id++;
+    cout << "client connected as client: " << client_id << endl;
     pthread_mutex_unlock(&mutex);
     pthread_create(&thread, NULL, handle, client);
   }
@@ -56,16 +57,18 @@ void *Proxy::handle(void *input) {
   int client_fd = client->client_fd;
   int client_id = client->client_id;
   string client_ip = client->client_ip;
-  char request_message[100000] = {0};
+  cout << "client ip is: " << client_ip << endl;
+  char request_message[65536] = {0};
   int len = recv(client_fd, &request_message, sizeof(request_message), 0);
+  cout << "received request with len: " << len << endl;
   if (len <= 0) {
     pthread_mutex_lock(&mutex);
     cout << client_id << "Invalid Request" << endl;
     pthread_mutex_unlock(&mutex);
     return NULL;
   }
-  string request_content;
-  request_content.assign(request_message, len);
+  string request_content(request_message, len);
+  cout << "request content is: " << request_message << endl;
   Parser_request request_parsed(request_content);
   pthread_mutex_lock(&mutex);
   cout << "current request is: " << request_parsed.first_line << endl;
@@ -126,7 +129,6 @@ void Proxy::CONNECT_request(int client_fd, int client_id, int server_fd) {
     select(nfds + 1, &readfds, NULL, NULL, NULL);
 
     int len_received_client, len_sent_client;
-
     char received_client_message[100000] = {0};
     if (FD_ISSET(client_fd, &readfds)) {
       len_received_client = recv(client_fd, &received_client_message,
@@ -332,13 +334,20 @@ void Proxy::get_from_server(int client_fd, int client_id, int server_fd,
     for (;;) {
       int remaining_chunk_len = recv(server_fd, &remaining_chunk,
                                      sizeof(remaining_chunk), MSG_NOSIGNAL);
+      cout << "------------------received remaining chunk with len: " << remaining_chunk_len << endl;
+      cout << "remaining chunk is:" << endl << remaining_chunk << endl;
       // check 502
-      string _502_checker_str(remaining_chunk);
-      Response_parser _502_checker(_502_checker_str);
-      if (check_502(_502_checker, client_fd, client_id)) return;
+      // string _502_checker_str(remaining_chunk);
+      // Response_parser _502_checker(_502_checker_str);
+      // if (check_502(_502_checker, client_fd, client_id)) {
+      //     cout << "------------------in chunked remaining message, 502------------------" << endl;
+      //     return;
+      // }
+      
 
       if (remaining_chunk_len <= 0) {
-        return;
+        cout << "-----------------finished loading chunked message-----------------" << endl;
+        break;
       }
       send(client_fd, &remaining_chunk, sizeof(remaining_chunk), MSG_NOSIGNAL);
     }
