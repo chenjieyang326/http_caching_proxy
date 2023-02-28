@@ -83,7 +83,8 @@ void *Proxy::handle(void *input) {
   if (request_parsed->method != "GET" && request_parsed->method != "POST" &&
       request_parsed->method != "CONNECT") {
     const char _400_Bad_Request[100] = "HTTP/1.1 400 Bad Request";
-    send(client_fd, &_400_Bad_Request, sizeof(_400_Bad_Request), MSG_NOSIGNAL);
+    size_t _400_Bad_Request_len = string("HTTP/1.1 400 Bad Request").size() + 1;
+    send(client_fd, &_400_Bad_Request, _400_Bad_Request_len, MSG_NOSIGNAL);
     pthread_mutex_lock(&mutex);
     logFile << client_id << ": Responding \"HTTP/1.1 400 Bad Request\""
             << std::endl;
@@ -247,7 +248,7 @@ void Proxy::POST_request(int client_fd, int client_id, int server_fd,
             << "\" from " << parser_request.url << endl;
     pthread_mutex_unlock(&mutex);
 
-    send(client_fd, &server_response_buffer, sizeof(server_response_buffer),
+    send(client_fd, &server_response_buffer, server_response_len,
          MSG_NOSIGNAL);
     pthread_mutex_lock(&mutex);
     logFile << client_id << ": Responding \"" << parser_response.firstLine
@@ -273,7 +274,7 @@ void Proxy::GET_request(int client_fd, int client_id, int server_fd,
     char request_message[100000];
     strcpy(request_message, request_message_str.c_str());
     request << request_message << endl;
-    send(server_fd, &request_message, sizeof(request_message), MSG_NOSIGNAL);
+    send(server_fd, &request_message, request_message_str.size() + 1, MSG_NOSIGNAL);
     get_from_server(client_fd, client_id, server_fd, request_parsed);
   } else { // found in cache
     int no_cache = (it->second.CacheControl.find("no-cache") != string::npos);
@@ -288,7 +289,7 @@ void Proxy::GET_request(int client_fd, int client_id, int server_fd,
         char original_request_message[original_request_message_str.size() + 1];
         strcpy(original_request_message, original_request_message_str.c_str());
         send(server_fd, &original_request_message,
-             sizeof(original_request_message), MSG_NOSIGNAL);
+             original_request_message_str.size() + 1, MSG_NOSIGNAL);
         get_from_server(client_fd, client_id, server_fd, request_parsed);
       } else {
         // use cache
