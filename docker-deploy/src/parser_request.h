@@ -27,32 +27,64 @@ public:
     // Extract the method from the first line
     method = first_line.substr(0, spacePos);
     std::cout << "Request Method is: " << method << std::endl;
-    // Find the position of the space character after the URL in the first line
-    std::size_t secondSpacePos = first_line.find(' ', spacePos + 1);
-
-    // Extract the URL from the first line
-    url = first_line.substr(spacePos + 1, secondSpacePos - spacePos - 1);
-    std::cout << "Request url is: " << url << std::endl;
-    std::size_t hostStart = url.find("://") + 3;
-    std::size_t hostEnd = url.find(":", hostStart);
-    if (hostEnd == std::string::npos) {
-      hostEnd = url.find("/", hostStart);
-      if (hostEnd == std::string::npos) {
-        hostEnd = url.length();
-      }
-      if (url.substr(0, 5) == "https")
-        port = "443";
-      else
-        port = "80";
-    } else {
-      // port = url.substr(hostEnd + 1);
-      size_t end = hostEnd + 1;
-      while (url[end] >= '0' && url[end] <= '9') {
-        end++;
-      }
-      port = url.substr(hostEnd, end - hostEnd);
+    size_t second_spacePos = first_line.find(' ', spacePos + 1);
+    std::cout << second_spacePos << std::endl;
+    url = first_line.substr(spacePos + 1, second_spacePos - spacePos - 1);
+    if (url.substr(0, 3) == "www") {
+        if (url.find(":") != std::string::npos) {
+            port = url.substr(url.find(":") + 1);
+            hostname = url.substr(0, url.find(":"));
+        }
+        else {
+            port = "443";
+            hostname = url;
+        }
     }
-    hostname = url.substr(hostStart, hostEnd - hostStart);
+    else if (url.substr(0,5) == "http:") {
+        size_t second_colon_pos = url.find(":", url.find(":") + 1);
+        if (second_colon_pos != std::string::npos) {
+            port = url.substr(second_colon_pos + 1);
+            size_t first_double = url.find("//") + 2;
+            size_t first_single = url.find("/", first_double);
+            hostname = url.substr(first_double, first_single - first_double);
+        }
+        else {
+            size_t first_double = url.find("//") + 2;
+            size_t first_single = url.find("/", first_double);
+            hostname = url.substr(first_double, first_single - first_double);
+            port = "80";
+        }
+    }
+    else if (url.substr(0,5) == "https") {
+        size_t second_colon_pos = url.find(":", url.find(":") + 1);
+        if (second_colon_pos != std::string::npos) {
+            port = url.substr(second_colon_pos + 1);
+            size_t first_double = url.find("//") + 2;
+            size_t first_single = url.find("/", first_double);
+            hostname = url.substr(first_double, first_single - first_double);
+        }
+        else {
+            size_t first_double = url.find("//") + 2;
+            size_t first_single = url.find("/", first_double);
+            hostname = url.substr(first_double, first_single - first_double);
+            port = "443";
+        }
+    }
+    else {
+        if (url.find(":") != std::string::npos) {
+            port = url.substr(url.find(":") + 1);
+            hostname = url.substr(0, url.find(":"));
+        }
+        else {
+            port = "443";
+            hostname = url;
+        }
+    }
+    std::cout << "#########################################" << std::endl;
+    std::cout << "port is: " << port << std::endl;
+    std::cout << "url is: " << url << std::endl;
+    std::cout << "hostname is: " << hostname << std::endl;
+    std::cout << "#########################################" << std::endl;
 
     // Parse the headers and store them in the headers field
     if (method != "POST" && method != "GET" && method != "CONNECT") return;

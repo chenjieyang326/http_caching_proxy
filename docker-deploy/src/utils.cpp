@@ -67,7 +67,7 @@ int client_setup(const char * hostname, const char * port) {
   status = getaddrinfo(hostname, port, &host_info, &host_info_list);
   if (status != 0) {
     cerr << "Error: cannot get address info for host" << endl;
-    cerr << "  (" << hostname << "," << port << ")" << endl;
+    cerr << "  (" << hostname << ", " << port << ")" << endl;
     return -1;
   } //if
 
@@ -76,14 +76,14 @@ int client_setup(const char * hostname, const char * port) {
 		     host_info_list->ai_protocol);
   if (socket_fd == -1) {
     cerr << "Error: cannot create socket" << endl;
-    cerr << "  (" << hostname << "," << port << ")" << endl;
+    cerr << "  (" << hostname << ", " << port << ")" << endl;
     return -1;
   } //if
 
   status = connect(socket_fd, host_info_list->ai_addr, host_info_list->ai_addrlen);
   if (status == -1) {
     cerr << "Error: cannot connect to socket" << endl;
-    cerr << "  (" << hostname << "," << port << ")" << endl;
+    cerr << "  (" << hostname << ", " << port << ")" << endl;
     return -1;
   } //if
 

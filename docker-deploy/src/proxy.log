@@ -1,5 +1,166 @@
-0: "GET http://run.mocky.io/v3/1dcf9190-4694-4dc9-aaba-b934abfda878 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 19:34:59 2023
-0: not in cache
-0: Requesting "GET http://run.mocky.io/v3/1dcf9190-4694-4dc9-aaba-b934abfda878 HTTP/1.1" from http://run.mocky.io/v3/1dcf9190-4694-4dc9-aaba-b934abfda878
-0: Received "HTTP/1.1 400 Bad Request" from http://run.mocky.io/v3/1dcf9190-4694-4dc9-aaba-b934abfda878
-0: Responding "HTTP/1.1 400 Bad Request"
+0: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:00 2023
+0: Responding "HTTP/1.1 200 OK"
+0: Tunnel closed
+1: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:00 2023
+1: Responding "HTTP/1.1 200 OK"
+1: Responding HTTP/1.1 502 Bad Gateway
+1: Tunnel closed
+2: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:00 2023
+2: Responding "HTTP/1.1 200 OK"
+2: Tunnel closed
+3: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:00 2023
+3: Responding "HTTP/1.1 200 OK"
+3: Responding HTTP/1.1 502 Bad Gateway
+3: Tunnel closed
+4: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:00 2023
+4: not in cache
+4: Requesting "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from http://detectportal.firefox.com/canonical.html
+4: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/canonical.html
+4: cached, expires at Tue Feb 28 05:01:56 2023
+4: Responding "HTTP/1.1 200 OK"
+5: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:00 2023
+5: not in cache
+5: Requesting "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from http://detectportal.firefox.com/success.txt?ipv4
+5: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+5: cached, expires at Tue Feb 28 13:19:03 2023
+5: Responding "HTTP/1.1 200 OK"
+6: "CONNECT www.baidu.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:01 2023
+6: Responding "HTTP/1.1 200 OK"
+6: Responding HTTP/1.1 502 Bad Gateway
+6: Tunnel closed
+7: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:01 2023
+7: in cache, but expired at Tue Feb 28 05:01:56 2023
+7: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/canonical.html
+7: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/canonical.html
+7: cached, expires at Tue Feb 28 05:01:56 2023
+7: Responding "HTTP/1.1 200 OK"
+8: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:01 2023
+8: in cache, but expired at Tue Feb 28 13:19:03 2023
+8: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+8: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+8: cached, expires at Tue Feb 28 15:12:25 2023
+8: Responding "HTTP/1.1 200 OK"
+9: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:24 2023
+9: Responding "HTTP/1.1 200 OK"
+9: Responding HTTP/1.1 502 Bad Gateway
+9: Tunnel closed
+10: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:24 2023
+10: in cache, but expired at Tue Feb 28 05:01:56 2023
+10: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/canonical.html
+10: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/canonical.html
+10: cached, expires at Tue Feb 28 10:04:11 2023
+10: Responding "HTTP/1.1 200 OK"
+11: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:24 2023
+12: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:24 2023
+11: in cache, but expired at Tue Feb 28 15:12:25 2023
+11: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+12: Responding "HTTP/1.1 200 OK"
+11: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+11: cached, expires at Tue Feb 28 11:12:08 2023
+11: Responding "HTTP/1.1 200 OK"
+12: Responding HTTP/1.1 502 Bad Gateway
+12: Tunnel closed
+13: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:24 2023
+13: in cache, but expired at Tue Feb 28 10:04:11 2023
+13: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/canonical.html
+13: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/canonical.html
+13: cached, expires at Tue Feb 28 23:18:28 2023
+13: Responding "HTTP/1.1 200 OK"
+14: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:24 2023
+14: in cache, but expired at Tue Feb 28 11:12:08 2023
+14: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+14: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+14: cached, expires at Tue Feb 28 09:20:10 2023
+14: Responding "HTTP/1.1 200 OK"
+15: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:24 2023
+15: Responding "HTTP/1.1 200 OK"
+15: Responding HTTP/1.1 502 Bad Gateway
+15: Tunnel closed
+16: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:24 2023
+16: in cache, valid
+16: Responding "HTTP/1.1 200 OK"
+17: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:24 2023
+17: in cache, but expired at Tue Feb 28 09:20:10 2023
+17: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+17: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+17: cached, expires at Tue Feb 28 16:49:15 2023
+17: Responding "HTTP/1.1 200 OK"
+18: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:25 2023
+18: Responding "HTTP/1.1 200 OK"
+18: Responding HTTP/1.1 502 Bad Gateway
+18: Tunnel closed
+19: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:25 2023
+19: Responding "HTTP/1.1 200 OK"
+19: Responding HTTP/1.1 502 Bad Gateway
+19: Tunnel closed
+20: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:25 2023
+20: in cache, valid
+20: Responding "HTTP/1.1 200 OK"
+21: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:25 2023
+21: in cache, but expired at Tue Feb 28 16:49:15 2023
+21: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+21: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+21: cached, expires at Tue Feb 28 15:12:25 2023
+21: Responding "HTTP/1.1 200 OK"
+22: "GET http://google.com/ HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:26 2023
+22: not in cache
+22: Requesting "GET http://google.com/ HTTP/1.1" from http://google.com/
+22: Received "HTTP/1.1 301 Moved Permanently" from http://google.com/
+22: Responding "HTTP/1.1 301 Moved Permanently"
+23: "GET http://www.google.com/ HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:26 2023
+23: not in cache
+23: Requesting "GET http://www.google.com/ HTTP/1.1" from http://www.google.com/
+23: Received "HTTP/1.1 302 Found" from http://www.google.com/
+23: Responding "HTTP/1.1 302 Found"
+24: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:26 2023
+24: Responding "HTTP/1.1 200 OK"
+24: Responding HTTP/1.1 502 Bad Gateway
+24: Tunnel closed
+26: "CONNECT incoming.telemetry.mozilla.org:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:26 2023
+25: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:26 2023
+25: in cache, valid
+25: Responding "HTTP/1.1 200 OK"
+26: Responding "HTTP/1.1 200 OK"
+27: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:26 2023
+26: Responding HTTP/1.1 502 Bad Gateway
+26: Tunnel closed
+27: in cache, but expired at Tue Feb 28 15:12:25 2023
+27: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+27: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+27: cached, expires at Tue Feb 28 15:12:25 2023
+27: Responding "HTTP/1.1 200 OK"
+29: "CONNECT incoming.telemetry.mozilla.org:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:26 2023
+28: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:26 2023
+28: in cache, valid
+28: Responding "HTTP/1.1 200 OK"
+29: Responding "HTTP/1.1 200 OK"
+30: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:27 2023
+29: Responding HTTP/1.1 502 Bad Gateway
+29: Tunnel closed
+30: in cache, but expired at Tue Feb 28 15:12:25 2023
+30: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+32: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:27 2023
+31: "CONNECT incoming.telemetry.mozilla.org:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:27 2023
+30: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+30: cached, expires at Tue Feb 28 13:19:03 2023
+30: Responding "HTTP/1.1 200 OK"
+32: in cache, valid
+32: Responding "HTTP/1.1 200 OK"
+31: Responding "HTTP/1.1 200 OK"
+33: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:27 2023
+31: Responding HTTP/1.1 502 Bad Gateway
+31: Tunnel closed
+33: in cache, but expired at Tue Feb 28 13:19:03 2023
+33: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+33: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+33: cached, expires at Tue Feb 28 09:07:41 2023
+33: Responding "HTTP/1.1 200 OK"
+34: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:27 2023
+34: in cache, valid
+34: Responding "HTTP/1.1 200 OK"
+35: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:27 2023
+35: in cache, but expired at Tue Feb 28 09:07:41 2023
+35: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+35: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+35: cached, expires at Tue Feb 28 09:07:41 2023
+35: Responding "HTTP/1.1 200 OK"

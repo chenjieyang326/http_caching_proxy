@@ -96,6 +96,10 @@ void *Proxy::handle(void *input) {
   pthread_mutex_unlock(&mutex);
   const char *request_hostname = request_parsed->hostname.c_str();
   const char *port = request_parsed->port.c_str();
+  cout << "#################################" << endl;
+  cout << request_hostname << endl;
+  cout << port << endl;
+  cout << "#################################" << endl;
   int server_fd = client_setup(request_hostname, port);
   if (server_fd == -1) {
     pthread_mutex_lock(&mutex);
