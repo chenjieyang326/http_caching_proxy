@@ -23,7 +23,7 @@ static unordered_map<string, Response_parser> cache;
 string getCurrTime() {
   time_t now = std::time(nullptr);
   stringstream ss;
-  ss << put_time(std::gmtime(&now), "%a, %d %b %Y %H:%M:%S GMT");
+  ss << put_time(std::gmtime(&now), "%a %b %d %H:%M:%S %Y");
   return ss.str();
 }
 
