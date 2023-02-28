@@ -1,166 +1,184 @@
-0: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:00 2023
+0: "CONNECT www.google.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:45 2023
 0: Responding "HTTP/1.1 200 OK"
+1: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:45 2023
 0: Tunnel closed
-1: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:00 2023
+1: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
+1: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
+2: "CONNECT www.google.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:45 2023
 1: Responding "HTTP/1.1 200 OK"
-1: Responding HTTP/1.1 502 Bad Gateway
-1: Tunnel closed
-2: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:00 2023
 2: Responding "HTTP/1.1 200 OK"
 2: Tunnel closed
-3: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:00 2023
+3: "CONNECT www.google.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:46 2023
 3: Responding "HTTP/1.1 200 OK"
-3: Responding HTTP/1.1 502 Bad Gateway
+4: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:46 2023
 3: Tunnel closed
-4: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:00 2023
-4: not in cache
-4: Requesting "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from http://detectportal.firefox.com/canonical.html
-4: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/canonical.html
-4: cached, expires at Tue Feb 28 05:01:56 2023
+4: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
+4: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
 4: Responding "HTTP/1.1 200 OK"
-5: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:00 2023
-5: not in cache
-5: Requesting "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from http://detectportal.firefox.com/success.txt?ipv4
-5: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
-5: cached, expires at Tue Feb 28 13:19:03 2023
+5: "CONNECT www.google.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:46 2023
 5: Responding "HTTP/1.1 200 OK"
-6: "CONNECT www.baidu.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:01 2023
+6: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:46 2023
+6: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
+6: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
 6: Responding "HTTP/1.1 200 OK"
-6: Responding HTTP/1.1 502 Bad Gateway
-6: Tunnel closed
-7: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:01 2023
-7: in cache, but expired at Tue Feb 28 05:01:56 2023
-7: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/canonical.html
-7: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/canonical.html
-7: cached, expires at Tue Feb 28 05:01:56 2023
+7: "CONNECT youtube.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:47 2023
 7: Responding "HTTP/1.1 200 OK"
-8: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:01 2023
-8: in cache, but expired at Tue Feb 28 13:19:03 2023
-8: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
-8: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
-8: cached, expires at Tue Feb 28 15:12:25 2023
+8: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:47 2023
+8: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
+8: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
 8: Responding "HTTP/1.1 200 OK"
-9: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:24 2023
+9: "CONNECT www.youtube.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
 9: Responding "HTTP/1.1 200 OK"
-9: Responding HTTP/1.1 502 Bad Gateway
-9: Tunnel closed
-10: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:24 2023
-10: in cache, but expired at Tue Feb 28 05:01:56 2023
-10: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/canonical.html
-10: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/canonical.html
-10: cached, expires at Tue Feb 28 10:04:11 2023
-10: Responding "HTTP/1.1 200 OK"
-11: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:24 2023
-12: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:24 2023
-11: in cache, but expired at Tue Feb 28 15:12:25 2023
-11: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
+10: "CONNECT incoming.telemetry.mozilla.org:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
+11: "CONNECT i.ytimg.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
+12: "CONNECT fonts.googleapis.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
+13: "CONNECT firefox.settings.services.mozilla.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
 12: Responding "HTTP/1.1 200 OK"
-11: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
-11: cached, expires at Tue Feb 28 11:12:08 2023
 11: Responding "HTTP/1.1 200 OK"
-12: Responding HTTP/1.1 502 Bad Gateway
-12: Tunnel closed
-13: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:24 2023
-13: in cache, but expired at Tue Feb 28 10:04:11 2023
-13: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/canonical.html
-13: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/canonical.html
-13: cached, expires at Tue Feb 28 23:18:28 2023
+14: "CONNECT safebrowsing.googleapis.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
 13: Responding "HTTP/1.1 200 OK"
-14: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:24 2023
-14: in cache, but expired at Tue Feb 28 11:12:08 2023
-14: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
-14: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
-14: cached, expires at Tue Feb 28 09:20:10 2023
 14: Responding "HTTP/1.1 200 OK"
-15: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:24 2023
+15: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
+16: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
+15: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
+16: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
+17: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
+15: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
+16: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
 15: Responding "HTTP/1.1 200 OK"
-15: Responding HTTP/1.1 502 Bad Gateway
-15: Tunnel closed
-16: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:24 2023
-16: in cache, valid
+17: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
 16: Responding "HTTP/1.1 200 OK"
-17: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:24 2023
-17: in cache, but expired at Tue Feb 28 09:20:10 2023
-17: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
-17: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
-17: cached, expires at Tue Feb 28 16:49:15 2023
+17: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
+10: Responding "HTTP/1.1 200 OK"
 17: Responding "HTTP/1.1 200 OK"
-18: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:25 2023
+18: "CONNECT content-signature-2.cdn.mozilla.net:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
+14: Tunnel closed
+19: "CONNECT fonts.gstatic.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
+20: "CONNECT accounts.google.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
 18: Responding "HTTP/1.1 200 OK"
-18: Responding HTTP/1.1 502 Bad Gateway
-18: Tunnel closed
-19: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:25 2023
 19: Responding "HTTP/1.1 200 OK"
-19: Responding HTTP/1.1 502 Bad Gateway
-19: Tunnel closed
-20: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:25 2023
-20: in cache, valid
 20: Responding "HTTP/1.1 200 OK"
-21: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:25 2023
-21: in cache, but expired at Tue Feb 28 16:49:15 2023
-21: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
-21: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
-21: cached, expires at Tue Feb 28 15:12:25 2023
-21: Responding "HTTP/1.1 200 OK"
-22: "GET http://google.com/ HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:26 2023
-22: not in cache
-22: Requesting "GET http://google.com/ HTTP/1.1" from http://google.com/
-22: Received "HTTP/1.1 301 Moved Permanently" from http://google.com/
-22: Responding "HTTP/1.1 301 Moved Permanently"
-23: "GET http://www.google.com/ HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:26 2023
-23: not in cache
-23: Requesting "GET http://www.google.com/ HTTP/1.1" from http://www.google.com/
-23: Received "HTTP/1.1 302 Found" from http://www.google.com/
-23: Responding "HTTP/1.1 302 Found"
-24: "CONNECT www.google.com:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:26 2023
+21: "POST http://r3.o.lencr.org/ HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
+22: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
+23: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
+21: Requesting "POST http://r3.o.lencr.org/ HTTP/1.1" from http://r3.o.lencr.org/
+22: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
+23: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
+22: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
+23: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
+22: Responding "HTTP/1.1 200 OK"
+23: Responding "HTTP/1.1 200 OK"
+21: Received "HTTP/1.1 400 Bad Request" from http://r3.o.lencr.org/
+21: Responding "HTTP/1.1 400 Bad Request"
+24: "CONNECT www.gstatic.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
 24: Responding "HTTP/1.1 200 OK"
-24: Responding HTTP/1.1 502 Bad Gateway
-24: Tunnel closed
-26: "CONNECT incoming.telemetry.mozilla.org:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:26 2023
-25: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:26 2023
-25: in cache, valid
+25: "CONNECT www.google.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
 25: Responding "HTTP/1.1 200 OK"
-26: Responding "HTTP/1.1 200 OK"
-27: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:26 2023
-26: Responding HTTP/1.1 502 Bad Gateway
-26: Tunnel closed
-27: in cache, but expired at Tue Feb 28 15:12:25 2023
-27: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
-27: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
-27: cached, expires at Tue Feb 28 15:12:25 2023
+26: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
+27: "CONNECT googleads.g.doubleclick.net:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
+26: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
 27: Responding "HTTP/1.1 200 OK"
-29: "CONNECT incoming.telemetry.mozilla.org:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:26 2023
-28: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:26 2023
-28: in cache, valid
+26: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
+26: Responding "HTTP/1.1 200 OK"
+28: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
+28: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
+28: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
 28: Responding "HTTP/1.1 200 OK"
+29: "CONNECT www.gstatic.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:48 2023
 29: Responding "HTTP/1.1 200 OK"
-30: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:27 2023
-29: Responding HTTP/1.1 502 Bad Gateway
-29: Tunnel closed
-30: in cache, but expired at Tue Feb 28 15:12:25 2023
-30: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
-32: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:27 2023
-31: "CONNECT incoming.telemetry.mozilla.org:443 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:27 2023
-30: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
-30: cached, expires at Tue Feb 28 13:19:03 2023
-30: Responding "HTTP/1.1 200 OK"
-32: in cache, valid
-32: Responding "HTTP/1.1 200 OK"
-31: Responding "HTTP/1.1 200 OK"
-33: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:27 2023
-31: Responding HTTP/1.1 502 Bad Gateway
-31: Tunnel closed
-33: in cache, but expired at Tue Feb 28 13:19:03 2023
-33: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
-33: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
-33: cached, expires at Tue Feb 28 09:07:41 2023
-33: Responding "HTTP/1.1 200 OK"
-34: "GET http://detectportal.firefox.com/canonical.html HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:27 2023
-34: in cache, valid
-34: Responding "HTTP/1.1 200 OK"
-35: "GET http://detectportal.firefox.com/success.txt?ipv4 HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 21:33:27 2023
-35: in cache, but expired at Tue Feb 28 09:07:41 2023
-35: Requesting "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
-35: Received "HTTP/1.1 200 OK" from http://detectportal.firefox.com/success.txt?ipv4
-35: cached, expires at Tue Feb 28 09:07:41 2023
+34: "CONNECT yt3.ggpht.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:49 2023
+35: "CONNECT yt3.ggpht.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:49 2023
+31: "CONNECT yt3.ggpht.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:49 2023
+33: "CONNECT yt3.ggpht.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:49 2023
+30: "CONNECT yt3.ggpht.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:49 2023
+32: "CONNECT yt3.ggpht.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:49 2023
 35: Responding "HTTP/1.1 200 OK"
+34: Responding "HTTP/1.1 200 OK"
+33: Responding "HTTP/1.1 200 OK"
+31: Responding "HTTP/1.1 200 OK"
+32: Responding "HTTP/1.1 200 OK"
+30: Responding "HTTP/1.1 200 OK"
+36: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:49 2023
+37: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:49 2023
+38: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:49 2023
+36: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
+37: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
+39: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:49 2023
+40: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:49 2023
+38: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
+36: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
+37: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
+38: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
+40: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
+39: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
+40: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
+39: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
+38: Responding "HTTP/1.1 200 OK"
+39: Responding "HTTP/1.1 200 OK"
+36: Responding "HTTP/1.1 200 OK"
+37: Responding "HTTP/1.1 200 OK"
+40: Responding "HTTP/1.1 200 OK"
+35: Tunnel closed
+31: Tunnel closed
+32: Tunnel closed
+30: Tunnel closed
+33: Tunnel closed
+41: "CONNECT static.doubleclick.net:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:49 2023
+43: "CONNECT jnn-pa.googleapis.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:49 2023
+41: Responding "HTTP/1.1 200 OK"
+43: Responding "HTTP/1.1 200 OK"
+44: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:01:49 2023
+44: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
+44: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
+44: Responding "HTTP/1.1 200 OK"
+45: "CONNECT rr4---sn-hjoj-gq0l.googlevideo.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:03 2023
+46: "CONNECT youtube.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:03 2023
+45: Responding "HTTP/1.1 200 OK"
+46: Responding "HTTP/1.1 200 OK"
+47: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:03 2023
+47: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
+47: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
+47: Responding "HTTP/1.1 200 OK"
+48: "CONNECT tpc.googlesyndication.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:03 2023
+49: "CONNECT rr4---sn-hjoj-gq0l.googlevideo.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:03 2023
+48: Responding "HTTP/1.1 200 OK"
+49: Responding "HTTP/1.1 200 OK"
+50: "CONNECT rr4---sn-hjoj-gq0l.googlevideo.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:03 2023
+50: Responding "HTTP/1.1 200 OK"
+51: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:03 2023
+51: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
+51: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
+51: Responding "HTTP/1.1 200 OK"
+52: "CONNECT pagead2.googlesyndication.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:03 2023
+52: Responding "HTTP/1.1 200 OK"
+53: "CONNECT yt3.googleusercontent.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:03 2023
+53: Responding "HTTP/1.1 200 OK"
+55: "CONNECT yt4.ggpht.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:04 2023
+57: "CONNECT yt4.ggpht.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:04 2023
+54: "CONNECT yt4.ggpht.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:04 2023
+58: "CONNECT yt4.ggpht.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:04 2023
+59: "CONNECT yt4.ggpht.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:04 2023
+56: "CONNECT yt4.ggpht.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:04 2023
+60: "CONNECT apis.google.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:04 2023
+60: Responding "HTTP/1.1 200 OK"
+58: Responding "HTTP/1.1 200 OK"
+55: Responding "HTTP/1.1 200 OK"
+56: Responding "HTTP/1.1 200 OK"
+59: Responding "HTTP/1.1 200 OK"
+57: Responding "HTTP/1.1 200 OK"
+54: Responding "HTTP/1.1 200 OK"
+61: "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:04 2023
+61: Requesting "POST http://ocsp.pki.goog/gts1c3 HTTP/1.1" from http://ocsp.pki.goog/gts1c3
+56: Tunnel closed
+55: Tunnel closed
+57: Tunnel closed
+61: Received "HTTP/1.1 200 OK" from http://ocsp.pki.goog/gts1c3
+54: Tunnel closed
+59: Tunnel closed
+61: Responding "HTTP/1.1 200 OK"
+63: "CONNECT signaler-pa.youtube.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:04 2023
+63: Responding "HTTP/1.1 200 OK"
+62: "CONNECT signaler-pa.youtube.com:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:04 2023
+62: Responding "HTTP/1.1 200 OK"
+64: "CONNECT offlintab.firefoxchina.cn:443 HTTP/1.1" from 10.197.83.39 @ Tue Feb 28 23:02:12 2023
+64: Responding "HTTP/1.1 200 OK"

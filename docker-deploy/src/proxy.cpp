@@ -126,7 +126,7 @@ void *Proxy::handle(void *input) {
 void Proxy::CONNECT_request(int client_fd, int client_id, int server_fd) {
   // send 200 OK to client
   const char CONNECT_message[100] = "HTTP/1.1 200 OK\r\n\r\n";
-  send(client_fd, &CONNECT_message, sizeof(CONNECT_message), MSG_NOSIGNAL);
+  send(client_fd, &CONNECT_message, 19, MSG_NOSIGNAL);
 
   // write 200 OK to log
   pthread_mutex_lock(&mutex);
@@ -141,7 +141,11 @@ void Proxy::CONNECT_request(int client_fd, int client_id, int server_fd) {
     FD_ZERO(&readfds);
     FD_SET(client_fd, &readfds);
     FD_SET(server_fd, &readfds);
-    select(nfds + 1, &readfds, NULL, NULL, NULL);
+    int select_flag = select(nfds + 1, &readfds, NULL, NULL, NULL);
+    if (select_flag <0) {
+      logFile << "Select Failed in CONNECT Request" << endl;
+      return;
+    }
 
     int len_received_client, len_sent_client;
     char received_client_message[100000] = {0};
@@ -156,7 +160,7 @@ void Proxy::CONNECT_request(int client_fd, int client_id, int server_fd) {
         return;
       }
       len_sent_client = send(server_fd, &received_client_message,
-                             sizeof(received_client_message), MSG_NOSIGNAL);
+                             len_received_client, MSG_NOSIGNAL);
       if (len_sent_client <= 0) {
         pthread_mutex_lock(&mutex);
         cout << "Fail to send client message from tunnel" << endl;
@@ -172,15 +176,15 @@ void Proxy::CONNECT_request(int client_fd, int client_id, int server_fd) {
       len_received_server = recv(server_fd, &received_server_message,
                                  sizeof(received_server_message), MSG_NOSIGNAL);
       // check 502
-      string _502_checker_tmp(received_server_message);
-      Response_parser _502_checker(_502_checker_tmp);
-      if (check_502(_502_checker, client_fd, client_id)) {
-        pthread_mutex_lock(&mutex);
-        cout << "Responding 502" << endl;
-        logFile << client_id << ": Tunnel closed" << std::endl;
-        pthread_mutex_unlock(&mutex);
-        return;
-      }
+      // string _502_checker_tmp(received_server_message);
+      // Response_parser _502_checker(_502_checker_tmp);
+      // if (check_502(_502_checker, client_fd, client_id)) {
+      //   pthread_mutex_lock(&mutex);
+      //   cout << "Responding 502" << endl;
+      //   logFile << client_id << ": Tunnel closed" << std::endl;
+      //   pthread_mutex_unlock(&mutex);
+      //   return;
+      // }
 
       if (len_received_server <= 0) {
         pthread_mutex_lock(&mutex);
@@ -190,7 +194,7 @@ void Proxy::CONNECT_request(int client_fd, int client_id, int server_fd) {
         return;
       }
       len_sent_server = send(client_fd, &received_server_message,
-                             sizeof(received_server_message), MSG_NOSIGNAL);
+                             len_received_server, MSG_NOSIGNAL);
       if (len_sent_server <= 0) {
         pthread_mutex_lock(&mutex);
         cout << "Fail to send server message from tunnel" << endl;
@@ -236,8 +240,8 @@ void Proxy::POST_request(int client_fd, int client_id, int server_fd,
     }
     string server_response_str = string(server_response_buffer);
     Response_parser parser_response(server_response_str);
-    if (check_502(parser_response, client_fd, client_id))
-      return;
+    // if (check_502(parser_response, client_fd, client_id))
+    //   return;
     pthread_mutex_lock(&mutex);
     logFile << client_id << ": Received \"" << parser_response.firstLine
             << "\" from " << parser_request.url << endl;
@@ -340,8 +344,8 @@ void Proxy::get_from_server(int client_fd, int client_id, int server_fd,
   }
   string server_response_buffer_str(server_response_buffer);
   Response_parser response_parsed(server_response_buffer_str);
-  if (check_502(response_parsed, client_fd, client_id))
-    return;
+  // if (check_502(response_parsed, client_fd, client_id))
+  //   return;
   pthread_mutex_lock(&mutex);
   logFile << client_id << ": Received \"" << response_parsed.firstLine
           << "\" from " << request_parsed.url << endl;
@@ -357,7 +361,7 @@ void Proxy::get_from_server(int client_fd, int client_id, int server_fd,
     pthread_mutex_unlock(&mutex);
     // cout << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
     // send first chunk to client
-    send(client_fd, &server_response_buffer, sizeof(server_response_buffer),
+    send(client_fd, &server_response_buffer, server_response_buffer_len,
          MSG_NOSIGNAL);
     // chunkout << server_response_buffer << endl;
     // cout << server_response_buffer << endl;
@@ -397,7 +401,7 @@ void Proxy::get_from_server(int client_fd, int client_id, int server_fd,
       //   // chunkout << remaining_chunk;
       //   break;
       // }
-      send(client_fd, &remaining_chunk, sizeof(remaining_chunk), MSG_NOSIGNAL);
+      send(client_fd, &remaining_chunk, remaining_chunk_len, MSG_NOSIGNAL);
     }
     // cout << "out of loop for chunk messasge receive" << endl;
     // string complete_message(server_response_buffer);
@@ -513,10 +517,10 @@ int Proxy::revalidate(Response_parser &response_parsed, int server_fd,
   int new_response_buffer_len = recv(server_fd, &new_response_buffer,
                                      sizeof(new_response_buffer), MSG_NOSIGNAL);
   // check 502
-  string _502_checker_str(new_response_buffer);
-  Response_parser _502_checker_new_response(_502_checker_str);
-  if (check_502(_502_checker_new_response, client_fd, client_id))
-    return 0;
+  // string _502_checker_str(new_response_buffer);
+  // Response_parser _502_checker_new_response(_502_checker_str);
+  // if (check_502(_502_checker_new_response, client_fd, client_id))
+  //   return 0;
   if (new_response_buffer_len <= 0) {
     pthread_mutex_lock(&mutex);
     cout << "receive revalidation failed from GET request" << endl;
