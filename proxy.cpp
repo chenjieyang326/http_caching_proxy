@@ -240,7 +240,7 @@ void Proxy::POST_request(int client_fd, int client_id, int server_fd,
     send(client_fd, &server_response_buffer, sizeof(server_response_buffer),
          MSG_NOSIGNAL);
     pthread_mutex_lock(&mutex);
-    logFile << client_id << ": Responding \"" << parser_response.firstLine
+    logFile << client_id << ": Responding \"" << parser_response.firstLine << "\""
             << endl;
     pthread_mutex_unlock(&mutex);
   }
@@ -344,24 +344,33 @@ void Proxy::get_from_server(int client_fd, int client_id, int server_fd,
       (response_parsed.response_content.find("chunked") != string::npos);
 
   if (is_chunk) {
+    cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
     pthread_mutex_lock(&mutex);
     cout << client_id << ": not cacheable because it is chunked" << endl;
     pthread_mutex_unlock(&mutex);
+    cout << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
     // send first chunk to client
     send(client_fd, &server_response_buffer, sizeof(server_response_buffer),
          MSG_NOSIGNAL);
+    // cout << "first message being sent is: \n" << server_response_buffer << endl;
     // send rest
     char remaining_chunk[28000] = {0};
     int chunk_id = 0;
     for (;;) {
       int remaining_chunk_len = recv(server_fd, &remaining_chunk,
                                      sizeof(remaining_chunk), MSG_NOSIGNAL);
-      cout << chunk_id <<": get remaining chunk len: " << remaining_chunk_len << endl;
+      // cout << chunk_id <<": get remaining chunk len: " << remaining_chunk_len << endl;
+      string remaining_chunk_str(remaining_chunk);
+      size_t pos = remaining_chunk_str.find("\r\n");
+      string status_str = remaining_chunk_str.substr(0, pos);
+      cout << chunk_id << ": size: " << remaining_chunk_len << endl;
       chunk_id++;
-      if (remaining_chunk_len <= 0) {
+      int URI_TOO_LONG = (string(remaining_chunk).find("URI Too Long") != string::npos);
+      if (remaining_chunk_len <= 0 || URI_TOO_LONG) {
         break;
       }
-      send(client_fd, &remaining_chunk, sizeof(remaining_chunk), MSG_NOSIGNAL);
+      if (status_str == "0") break; 
+      send(client_fd, &remaining_chunk, remaining_chunk_len, MSG_NOSIGNAL);
     }
     // string complete_message(server_response_buffer);
     // for (;;) {
