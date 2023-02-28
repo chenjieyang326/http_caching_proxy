@@ -18,6 +18,8 @@ using namespace std;
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 ofstream logFile("proxy.log");
+ofstream chunkout("chunkout.log");
+ofstream request("request.log");
 static unordered_map<string, Response_parser> cache;
 
 string getCurrTime() {
@@ -168,14 +170,14 @@ void Proxy::CONNECT_request(int client_fd, int client_id, int server_fd) {
       // check 502
       string _502_checker_tmp(received_server_message);
       Response_parser _502_checker(_502_checker_tmp);
-      if (check_502(_502_checker, client_fd, client_id)){
+      if (check_502(_502_checker, client_fd, client_id)) {
         pthread_mutex_lock(&mutex);
         cout << "Responding 502" << endl;
         logFile << client_id << ": Tunnel closed" << std::endl;
         pthread_mutex_unlock(&mutex);
         return;
       }
-        
+
       if (len_received_server <= 0) {
         pthread_mutex_lock(&mutex);
         cout << "Fail to receive server message from tunnel" << endl;
@@ -240,8 +242,8 @@ void Proxy::POST_request(int client_fd, int client_id, int server_fd,
     send(client_fd, &server_response_buffer, sizeof(server_response_buffer),
          MSG_NOSIGNAL);
     pthread_mutex_lock(&mutex);
-    logFile << client_id << ": Responding \"" << parser_response.firstLine << "\""
-            << endl;
+    logFile << client_id << ": Responding \"" << parser_response.firstLine
+            << "\"" << endl;
     pthread_mutex_unlock(&mutex);
   }
 }
@@ -262,6 +264,7 @@ void Proxy::GET_request(int client_fd, int client_id, int server_fd,
     string request_message_str = request_parsed.request_content;
     char request_message[100000];
     strcpy(request_message, request_message_str.c_str());
+    request << request_message << endl;
     send(server_fd, &request_message, sizeof(request_message), MSG_NOSIGNAL);
     get_from_server(client_fd, client_id, server_fd, request_parsed);
   } else { // found in cache
@@ -344,34 +347,55 @@ void Proxy::get_from_server(int client_fd, int client_id, int server_fd,
       (response_parsed.response_content.find("chunked") != string::npos);
 
   if (is_chunk) {
-    cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+    // cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
     pthread_mutex_lock(&mutex);
     cout << client_id << ": not cacheable because it is chunked" << endl;
     pthread_mutex_unlock(&mutex);
-    cout << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+    // cout << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
     // send first chunk to client
     send(client_fd, &server_response_buffer, sizeof(server_response_buffer),
          MSG_NOSIGNAL);
-    // cout << "first message being sent is: \n" << server_response_buffer << endl;
-    // send rest
+    // chunkout << server_response_buffer << endl;
+    // cout << server_response_buffer << endl;
+    // cout << "first message being sent is: \n" << server_response_buffer <<
+    // endl; send rest
     char remaining_chunk[28000] = {0};
     int chunk_id = 0;
     for (;;) {
+      // break;
       int remaining_chunk_len = recv(server_fd, &remaining_chunk,
                                      sizeof(remaining_chunk), MSG_NOSIGNAL);
-      // cout << chunk_id <<": get remaining chunk len: " << remaining_chunk_len << endl;
-      string remaining_chunk_str(remaining_chunk);
-      size_t pos = remaining_chunk_str.find("\r\n");
-      string status_str = remaining_chunk_str.substr(0, pos);
-      cout << chunk_id << ": size: " << remaining_chunk_len << endl;
-      chunk_id++;
-      int URI_TOO_LONG = (string(remaining_chunk).find("URI Too Long") != string::npos);
-      if (remaining_chunk_len <= 0 || URI_TOO_LONG) {
+      // chunkout << remaining_chunk << endl;
+      // string complete(server_response_buffer);
+      // complete += string(remaining_chunk);
+      // char complete_to_send[complete.size() + 1];
+      // strcpy(complete_to_send, complete.c_str());
+      // send(client_fd, &complete_to_send, sizeof(complete_to_send), MSG_NOSIGNAL);
+      // cout << "-----------------------------" << endl;
+      // cout << remaining_chunk << endl;
+      // cout << "-----------------------------" << endl;
+      // break;
+      // // cout << chunk_id <<": get remaining chunk len: " << remaining_chunk_len
+      // << endl; string remaining_chunk_str(remaining_chunk); size_t pos =
+      // remaining_chunk_str.find("\r\n"); string status_str =
+      // remaining_chunk_str.substr(0, pos); cout << chunk_id << ": size: " <<
+      // remaining_chunk_len << endl; chunk_id++; int URI_TOO_LONG =
+      // (string(remaining_chunk).find("URI Too Long") != string::npos); if
+      // (remaining_chunk_len <= 0 || URI_TOO_LONG) {
+      //   break;
+      // }
+      if (remaining_chunk_len <= 0)
         break;
-      }
-      if (status_str == "0") break; 
-      send(client_fd, &remaining_chunk, remaining_chunk_len, MSG_NOSIGNAL);
+      // if (status_str == "0") break;
+      // if (chunk_id == 0) {
+      //   send(client_fd, &remaining_chunk, remaining_chunk_len, MSG_NOSIGNAL);
+      //   // cout << remaining_chunk;
+      //   // chunkout << remaining_chunk;
+      //   break;
+      // }
+      send(client_fd, &remaining_chunk, sizeof(remaining_chunk), MSG_NOSIGNAL);
     }
+    // cout << "out of loop for chunk messasge receive" << endl;
     // string complete_message(server_response_buffer);
     // for (;;) {
     //   char remaining_chunk[100000] = {0};

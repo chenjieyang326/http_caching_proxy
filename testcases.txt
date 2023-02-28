@@ -1,0 +1,27 @@
+=================================
+METHOD---POST
+================================
+--------------------------------------------------
+TEST CASE:
+http://httpbin.org/forms/post
+action: visit, refresh, click submit order
+--------------------------------------------------
+Result: 
+0: "GET http://httpbin.org/forms/post HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 19:21:58 2023
+0: not in cache
+0: Requesting "GET http://httpbin.org/forms/post HTTP/1.1" from http://httpbin.org/forms/post
+0: Received "HTTP/1.1 200 OK" from http://httpbin.org/forms/post
+0: cached, expires at Tue Feb 28 19:21:58 2023
+0: Responding "HTTP/1.1 200 OK"
+1: "GET http://httpbin.org/forms/post HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 19:22:00 2023
+1: in cache, but expired at Tue Feb 28 19:21:58 2023
+1: Requesting "HTTP/1.1 200 OK" from http://httpbin.org/forms/post
+1: Received "HTTP/1.1 200 OK" from http://httpbin.org/forms/post
+1: cached, expires at Tue Feb 28 19:22:00 2023
+1: Responding "HTTP/1.1 200 OK"
+2: "POST http://httpbin.org/post HTTP/1.1" from 173.95.91.85 @ Tue Feb 28 19:22:03 2023
+2: Requesting "POST http://httpbin.org/post HTTP/1.1" from http://httpbin.org/post
+2: Received "HTTP/1.1 200 OK" from http://httpbin.org/post
+2: Responding "HTTP/1.1 200 OK"
+
+

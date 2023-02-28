@@ -1,0 +1,49 @@
+1.Cache Policy:
+We used an unordered map<string, Response>, where the key (string) is the request url, 
+and the response is a class we implemented to store all the necessary headers for a HTTP response.
+
+Cache Size: 20
+
+Replacement Policy: When a response is expired (we validate it when a request matches the record), 
+we request validation, if no update, update its expire info, if there are updates, replace the 
+original response with the new response. If the cache meets its capacity, remove the 
+beginining pointer of the iterator of cache.
+
+When to clean expired response: We do not clean expired response, unless there is 
+a request that matches the request url. For how it gets handled, refer to replacement policy.
+
+2. Synchronization for Cache:
+Instead of locking the entire cache for all operations, only the following operations 
+are locked with a phtread mutex lock:
+    2.1.1Accessing or modifying shared data: Whenever a thread wants to read or modify data in the cache, 
+    it should first acquire a lock to prevent other threads from accessing the same data concurrently.
+    2.1.2Updating the cache: Whenever a thread wants to add or remove data from the cache, it should 
+    acquire a lock to prevent other threads from modifying the same data.
+The following operations will not be locked:
+    2.2.1 Reading from the cache: If a thread only wants to read data from the cache and does not modify it, 
+    then it does not need to acquire a lock. However, it should still use atomic operations to ensure 
+    that the data is accessed safely.
+    2.2.2 Computing new data: If a thread needs to compute new data to add to the cache, it can do so without 
+    acquiring a lock. However, it should still ensure that the data is added atomically to the cache.
+
+
+3. External Failures:
+    3.1 Network failures: These can include connectivity issues, network congestion, or server outages. 
+    To handle these, the proxy server is designed to response with a 502 bad gateway error message and shutdown the socket.
+    3.2 Security threats: The proxy server might be vulnerable to attacks such as injection attacks. To handle this, 
+    the server is designed with a parser to parse requests and filter out bad requests.
+    3.3 Buffer Overload: The proxy may receive messages that exceeds the buffer capacity, which may cause buffer overloads. 
+    To handle this, the server checks every message it receives and handles abonormal behaviors.
+
+4. Exception Guarantees:
+    4.1 No memory leaks: The program should ensure that all dynamically allocated memory is 
+    properly freed, even in the case of an exception.
+
+    4.2 No resource leaks: The program should ensure that all system resources (such as file 
+    handles, network sockets, etc.) are properly released, even in the case of an exception.
+
+    4.3 No data corruption: The program should ensure that all internal data structures remain 
+    in a consistent and usable state, even in the case of an exception.
+
+    4.4 No deadlocks: The program should ensure that it does not get stuck in a deadlock state, 
+    even in the case of an exception.
