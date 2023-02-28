@@ -407,14 +407,14 @@ void Proxy::add_to_cache(Response_parser &response_parsed,
         struct tm *asc_time = gmtime(&expire_time);
         const char *t = asctime(asc_time);
         pthread_mutex_lock(&mutex);
-        logFile << client_id << ": cached, expires at " << t << endl;
+        logFile << client_id << ": cached, expires at " << t;
         pthread_mutex_unlock(&mutex);
       } else if (response_parsed.convertedExpires != -1) {
         time_t expire_time = response_parsed.convertedExpires;
         struct tm *asc_time = gmtime(&expire_time);
         const char *t = asctime(asc_time);
         pthread_mutex_lock(&mutex);
-        logFile << client_id << ": cached, expires at " << t << endl;
+        logFile << client_id << ": cached, expires at " << t;
         pthread_mutex_unlock(&mutex);
       }
     }
