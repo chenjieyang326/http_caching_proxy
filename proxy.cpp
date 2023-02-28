@@ -190,7 +190,7 @@ void Proxy::POST_request(int client_fd, int client_id, int server_fd,
   pthread_mutex_lock(&mutex);
   logFile << client_id << ": "
           << "Requesting \"" << parser_request.first_line << "\" from "
-          << parser_request.hostname << endl;
+          << parser_request.url << endl;
   pthread_mutex_unlock(&mutex);
   if (content_len == -1) {
     cout << "Cannot get request content length in POST request" << endl;
@@ -219,7 +219,7 @@ void Proxy::POST_request(int client_fd, int client_id, int server_fd,
       return;
     pthread_mutex_lock(&mutex);
     logFile << client_id << ": Received \"" << parser_response.firstLine
-            << "\" from " << parser_request.hostname << endl;
+            << "\" from " << parser_request.url << endl;
     pthread_mutex_unlock(&mutex);
 
     send(client_fd, &server_response_buffer, sizeof(server_response_buffer),
@@ -241,7 +241,7 @@ void Proxy::GET_request(int client_fd, int client_id, int server_fd,
     pthread_mutex_unlock(&mutex);
     pthread_mutex_lock(&mutex);
     logFile << client_id << ": Requesting \"" << request_parsed.first_line
-            << "\" from " << request_parsed.hostname << endl;
+            << "\" from " << request_parsed.url << endl;
     pthread_mutex_unlock(&mutex);
     string request_message_str = request_parsed.request_content;
     char request_message[100000];
@@ -255,7 +255,7 @@ void Proxy::GET_request(int client_fd, int client_id, int server_fd,
         // ask server
         pthread_mutex_lock(&mutex);
         logFile << client_id << ": Requesting \"" << it->second.firstLine
-                << "\" from " << request_parsed.hostname << endl;
+                << "\" from " << request_parsed.url << endl;
         pthread_mutex_unlock(&mutex);
         string original_request_message_str = request_parsed.request_content;
         char original_request_message[original_request_message_str.size() + 1];
@@ -291,7 +291,7 @@ void Proxy::GET_request(int client_fd, int client_id, int server_fd,
         // ask server
         pthread_mutex_lock(&mutex);
         logFile << client_id << ": Requesting \"" << it->second.firstLine
-                << "\" from " << request_parsed.hostname << endl;
+                << "\" from " << request_parsed.url << endl;
         pthread_mutex_unlock(&mutex);
         string original_request_message_str = request_parsed.request_content;
         char original_request_message[original_request_message_str.size() + 1];
@@ -321,7 +321,7 @@ void Proxy::get_from_server(int client_fd, int client_id, int server_fd,
     return;
   pthread_mutex_lock(&mutex);
   logFile << client_id << ": Received \"" << response_parsed.firstLine
-          << "\" from " << request_parsed.hostname << endl;
+          << "\" from " << request_parsed.url << endl;
 
   pthread_mutex_unlock(&mutex);
   int is_chunk =
