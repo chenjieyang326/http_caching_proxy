@@ -10,10 +10,10 @@ public:
   std::string hostname;
   std::string port;
   std::unordered_map<std::string, std::string> headers;
-  
+
   Parser_request(const std::string &request) : request_content(request) {
     // Find the position of the first newline character in the request
-    std::size_t newlinePos = request.find('\n');
+    std::size_t newlinePos = request.find("\r\n");
 
     // Extract the first line of the request
     first_line = request.substr(0, newlinePos);
@@ -31,26 +31,30 @@ public:
     // Extract the URL from the first line
     url = first_line.substr(spacePos + 1, secondSpacePos - spacePos - 1);
 
-    // Find the position of the colon character in the URL
-    std::size_t colonPos = url.find(':');
-
-    // If the URL contains a colon character, extract the hostname and port
-    if (colonPos != std::string::npos) {
-      hostname = url.substr(0, colonPos);
-      port = url.substr(colonPos + 1);
+    std::size_t hostStart = url.find("://") + 3;
+    std::size_t hostEnd = url.find(":", hostStart);
+    if (hostEnd == std::string::npos) {
+      hostEnd = url.find("/", hostStart);
+      if (hostEnd == std::string::npos) {
+        hostEnd = url.length();
+      }
+      if (url.substr(0, 5) == "https") port = "443";
+      else port = "80";
+    } else {
+      //port = url.substr(hostEnd + 1);
+      size_t end = hostEnd + 1;
+      while (url[end] >= '0' && url[end] <= '9') {
+          end++;
+      }
+      port = url.substr(hostEnd, end - hostEnd);
     }
-    // Otherwise, assume that the URL contains only the hostname and use the
-    // default port 80
-    else {
-      hostname = url;
-      port = "80";
-    }
+    hostname = url.substr(hostStart, hostEnd - hostStart);
 
     // Parse the headers and store them in the headers field
     std::size_t pos = newlinePos + 1;
     headers["Content-Length"] = -1;
     while (pos < request.length() - 1) {
-      std::size_t endlinePos = request.find('\n', pos);
+      std::size_t endlinePos = request.find("\r\n", pos);
       std::size_t colonPos = request.find(':', pos);
       if (colonPos != std::string::npos) {
         std::string headerName = request.substr(pos, colonPos - pos);

@@ -49,6 +49,7 @@ int server_setup(const char *port) {
     return -1;
   } //if
   freeaddrinfo(host_info_list);
+  cout << "proxy setup success" << endl;
   return socket_fd;
 }
 
@@ -87,7 +88,7 @@ int client_setup(const char * hostname, const char * port) {
   } //if
 
   freeaddrinfo(host_info_list);
-
+  cout << "connect server success" << endl;
   return socket_fd;
 }
 
@@ -103,6 +104,7 @@ int server_accept(int socket_fd, string & ip) {
   } //if
   struct sockaddr_in * addr = (struct sockaddr_in *)&socket_addr;
   ip = inet_ntoa(addr->sin_addr);
+  cout << "connect client success" << endl;
   return client_connection_fd;
 }
 

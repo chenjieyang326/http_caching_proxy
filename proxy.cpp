@@ -68,6 +68,12 @@ void *Proxy::handle(void *input) {
   request_content.assign(request_message, len);
   Parser_request request_parsed(request_content);
   pthread_mutex_lock(&mutex);
+  cout << "current request is: " << request_parsed.first_line << endl;
+  cout << "host name is: " << request_parsed.hostname << endl;
+  cout << "port number is: " << request_parsed.port << endl;
+  cout << "Content-len is: " << request_parsed.headers["Content-Length"] << endl;
+  pthread_mutex_unlock(&mutex);
+  pthread_mutex_lock(&mutex);
   logFile << client_id << ": \"" << request_parsed.first_line << "\" from "
           << client_ip << " @ " << getCurrTime().append("\0");
   pthread_mutex_unlock(&mutex);
