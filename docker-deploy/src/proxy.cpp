@@ -241,8 +241,8 @@ void Proxy::POST_request(int client_fd, int client_id, int server_fd,
     }
     string server_response_str = string(server_response_buffer);
     Response_parser parser_response(server_response_str);
-    // if (check_502(parser_response, client_fd, client_id))
-    //   return;
+    if (check_502(parser_response, client_fd, client_id))
+      return;
     pthread_mutex_lock(&mutex);
     logFile << client_id << ": Received \"" << parser_response.firstLine
             << "\" from " << parser_request.url << endl;
@@ -345,8 +345,8 @@ void Proxy::get_from_server(int client_fd, int client_id, int server_fd,
   }
   string server_response_buffer_str(server_response_buffer);
   Response_parser response_parsed(server_response_buffer_str);
-  // if (check_502(response_parsed, client_fd, client_id))
-  //   return;
+  if (check_502(response_parsed, client_fd, client_id))
+    return;
   pthread_mutex_lock(&mutex);
   logFile << client_id << ": Received \"" << response_parsed.firstLine
           << "\" from " << request_parsed.url << endl;
@@ -518,10 +518,10 @@ int Proxy::revalidate(Response_parser &response_parsed, int server_fd,
   int new_response_buffer_len = recv(server_fd, &new_response_buffer,
                                      sizeof(new_response_buffer), MSG_NOSIGNAL);
   // check 502
-  // string _502_checker_str(new_response_buffer);
-  // Response_parser _502_checker_new_response(_502_checker_str);
-  // if (check_502(_502_checker_new_response, client_fd, client_id))
-  //   return 0;
+  string _502_checker_str(new_response_buffer);
+  Response_parser _502_checker_new_response(_502_checker_str);
+  if (check_502(_502_checker_new_response, client_fd, client_id))
+    return 0;
   if (new_response_buffer_len <= 0) {
     pthread_mutex_lock(&mutex);
     cout << "receive revalidation failed from GET request" << endl;
