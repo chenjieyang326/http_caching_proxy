@@ -45,8 +45,9 @@ void Proxy::run() {
     pthread_t thread;
     pthread_mutex_lock(&mutex);
     Client *client = new Client(client_fd, client_id, client_ip);
-    client_id++;
+    //client_id++;
     cout << "client connected as client: " << client_id << endl;
+    client_id++;
     pthread_mutex_unlock(&mutex);
     pthread_create(&thread, NULL, handle, client);
   }
@@ -79,7 +80,7 @@ void *Proxy::handle(void *input) {
   pthread_mutex_unlock(&mutex);
   pthread_mutex_lock(&mutex);
   logFile << client_id << ": \"" << request_parsed.first_line << "\" from "
-          << client_ip << " @ " << getCurrTime().append("\0");
+          << client_ip << " @ " << getCurrTime().append("\0") << endl;
   pthread_mutex_unlock(&mutex);
   if (request_parsed.method != "GET" && request_parsed.method != "POST" &&
       request_parsed.method != "CONNECT") {

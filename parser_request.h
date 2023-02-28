@@ -1,6 +1,6 @@
+#include <iostream>
 #include <string>
 #include <unordered_map>
-#include <iostream>
 
 class Parser_request {
 public:
@@ -11,6 +11,7 @@ public:
   std::string hostname;
   std::string port;
   std::unordered_map<std::string, std::string> headers;
+  std::string body;
 
   Parser_request(const std::string &request) : request_content(request) {
     // Find the position of the first newline character in the request
@@ -39,32 +40,45 @@ public:
       if (hostEnd == std::string::npos) {
         hostEnd = url.length();
       }
-      if (url.substr(0, 5) == "https") port = "443";
-      else port = "80";
+      if (url.substr(0, 5) == "https")
+        port = "443";
+      else
+        port = "80";
     } else {
-      //port = url.substr(hostEnd + 1);
+      // port = url.substr(hostEnd + 1);
       size_t end = hostEnd + 1;
       while (url[end] >= '0' && url[end] <= '9') {
-          end++;
+        end++;
       }
       port = url.substr(hostEnd, end - hostEnd);
     }
     hostname = url.substr(hostStart, hostEnd - hostStart);
 
     // Parse the headers and store them in the headers field
-    std::size_t pos = newlinePos + 1;
-    headers["Content-Length"] = "-1";
-    while (pos < request.length() - 1) {
-      std::size_t endlinePos = request.find("\r\n", pos);
-      std::size_t colonPos = request.find(':', pos);
-      if (colonPos != std::string::npos) {
-        std::string headerName = request.substr(pos, colonPos - pos);
-        std::string headerValue =
-            request.substr(colonPos + 2, endlinePos - colonPos - 3);
-        headers[headerName] = headerValue;
+    if (method != "POST") {
+      std::size_t pos = newlinePos + 1;
+      headers["Content-Length"] = "-1";
+      while (pos < request.length() - 1) {
+        std::size_t endlinePos = request.find("\r\n", pos);
+        std::size_t colonPos = request.find(':', pos);
+        if (colonPos != std::string::npos) {
+          std::string headerName = request.substr(pos, colonPos - pos);
+          std::string headerValue =
+              request.substr(colonPos + 2, endlinePos - colonPos - 3);
+          headers[headerName] = headerValue;
+        }
+        pos = endlinePos + 1;
       }
-      pos = endlinePos + 1;
+      std::cout << "parse request success" << std::endl;
     }
-    std::cout << "parse request success" << std::endl;
+    else { // is post
+        std::size_t body_start = request.find("\r\n\r\n") + 4;
+        body = request.substr(body_start, request.size() - body_start);
+        std::string tmp = "Content-Length";
+        std::size_t start = request.find("Content-Length") + tmp.size() + 2;
+        std::size_t len = request.find("\r\n") - request.find(" ");
+        std::string content_len = request.substr(start, len);
+        headers[tmp] = content_len;
+    }
   }
 };
